@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --background: #f3f6f5;
+  --foreground: #162621;
+  --card: #ffffff;
+  --muted: #e9efec;
+  --muted-foreground: #4d6259;
+  --border: #d6e1db;
+  --primary: #175445;
+  --primary-hover: #103e33;
+  --primary-foreground: #ffffff;
+  --ring: #266d60;
+  --waiting-surface: #fff0d1;
+  --waiting-ink: #744302;
+  --ready-surface: #dcf1e2;
+  --ready-ink: #16512f;
+  --danger: #9a2e2a;
+  --danger-surface: #fff0ed;
+}
+
+@theme inline {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ring: var(--ring);
+  --color-waiting-surface: var(--waiting-surface);
+  --color-waiting-ink: var(--waiting-ink);
+  --color-ready-surface: var(--ready-surface);
+  --color-ready-ink: var(--ready-ink);
+  --color-danger: var(--danger);
+  --color-danger-surface: var(--danger-surface);
+}
+
+@layer base {
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
