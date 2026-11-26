@@ -10,7 +10,7 @@ export function SiteHeader() {
   const isStaffPage = pathname === "/staff";
 
   return (
-    <header className="border-b border-border bg-card">
+    <header className={cn("border-b border-border bg-card text-foreground", isStaffPage && "staff-theme")}>
       <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-8">
         <Link href="/" className="flex min-h-11 items-center gap-2.5 rounded-lg">
           <BellRing size={19} strokeWidth={1.75} className="text-primary" aria-hidden="true" />

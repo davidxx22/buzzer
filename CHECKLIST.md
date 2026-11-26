@@ -23,7 +23,7 @@
 - [x] Verify ready orders move above the waiting section and keep keyboard focus in Active orders.
 - [x] Verify the heading, counts, and order lists fit inside one staff queue card on desktop and mobile.
 - [x] Verify the staff queue’s waiting number stubs use #A4161A with readable light text, while customer waiting tickets stay pink.
-- [x] Verify the staff page’s white backdrop fills the viewport around the dark queue card on desktop and mobile.
+- [x] Verify the staff page’s white backdrop, shadowed white queue card, white navbar, and #386641 buttons on desktop and mobile.
 
 ## Later phases
 

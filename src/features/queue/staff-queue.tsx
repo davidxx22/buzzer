@@ -85,7 +85,7 @@ export function StaffQueue() {
     .filter(({ orders }) => orders.length > 0);
 
   return (
-    <Card className="mx-auto my-8 w-[calc(100%-2rem)] max-w-[68rem] p-3 sm:my-12 sm:w-[calc(100%-4rem)] sm:p-6">
+    <Card className="mx-auto my-8 w-[calc(100%-2rem)] max-w-[68rem] border-0 p-3 shadow-lg shadow-black/10 sm:my-12 sm:w-[calc(100%-4rem)] sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-5xl leading-none font-semibold sm:text-6xl">Order queue</h1>

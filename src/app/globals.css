@@ -3,7 +3,7 @@
 :root {
   color-scheme: dark;
   --background: #211b22;
-  --foreground: #fbf1e8;
+  --foreground: var(--paper-light-ink);
   --card: #2b242c;
   --muted: #40343e;
   --muted-foreground: #cdbdc7;
@@ -23,6 +23,27 @@
   --paper-green: #276447;
   --paper-collected: #dfd4c9;
   --paper-ink: #2a2028;
+  --paper-light-ink: #fbf1e8;
+}
+
+.staff-theme {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #211b22;
+  --card: #ffffff;
+  --muted: #f3f2f3;
+  --muted-foreground: #625960;
+  --border: #dedade;
+  --primary: #386641;
+  --primary-hover: #2d5234;
+  --primary-foreground: #ffffff;
+  --ring: var(--primary);
+  --waiting-surface: var(--muted);
+  --waiting-ink: var(--foreground);
+  --ready-surface: var(--muted);
+  --ready-ink: var(--foreground);
+  --danger: #972e36;
+  --danger-surface: #fff1f1;
 }
 
 @theme inline {
@@ -62,12 +83,12 @@
 
   .staff-ticket-number[data-tone="waiting"] {
     --paper: #a4161a;
-    color: var(--foreground);
+    color: var(--paper-light-ink);
   }
 
   .ticket-paper[data-tone="ready"] {
     --paper: var(--paper-green);
-    color: var(--foreground);
+    color: var(--paper-light-ink);
     color-scheme: dark;
   }
 
