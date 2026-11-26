@@ -60,6 +60,11 @@
     --paper: var(--paper-pink);
   }
 
+  .staff-ticket-number[data-tone="waiting"] {
+    --paper: #a4161a;
+    color: var(--foreground);
+  }
+
   .ticket-paper[data-tone="ready"] {
     --paper: var(--paper-green);
     color: var(--foreground);
