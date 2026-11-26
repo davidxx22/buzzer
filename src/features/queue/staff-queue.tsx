@@ -28,10 +28,11 @@ export function StaffQueue() {
   const [createError, setCreateError] = useState("");
   const activeFilter = useRef<HTMLButtonElement>(null);
 
-  async function advanceTicket(ticket: QueueTicket, restoreFocus: boolean) {
+  async function advanceTicket(ticket: QueueTicket, trigger: HTMLButtonElement) {
     const next = nextStatus(ticket.status);
     if (!next || pendingId) return;
 
+    const restoreFocus = document.activeElement === trigger;
     setPendingId(ticket.id);
     setAnnouncement("");
     setError("");
@@ -41,7 +42,9 @@ export function StaffQueue() {
       const label = formatTicketNumber(ticket);
       if (updated) {
         setAnnouncement(`${label} marked ${next}.`);
-        if (next === "collected" && restoreFocus) activeFilter.current?.focus();
+        if (restoreFocus && (document.activeElement === trigger || document.activeElement === document.body)) {
+          activeFilter.current?.focus();
+        }
       } else {
         setError(`${label} already changed. The queue has been refreshed.`);
       }
@@ -71,7 +74,15 @@ export function StaffQueue() {
   }
 
   const tickets = state.kind === "loaded" ? state.tickets : [];
-  const visibleTickets = tickets.filter((ticket) => (view === "collected") === (ticket.status === "collected"));
+  const sections = view === "active"
+    ? [
+        { label: "Ready for pickup", status: "ready" },
+        { label: "Waiting orders", status: "waiting" },
+      ]
+    : [{ label: "Collected orders", status: "collected" }];
+  const visibleSections = sections
+    .map(({ label, status }) => ({ label, orders: tickets.filter((ticket) => ticket.status === status) }))
+    .filter(({ orders }) => orders.length > 0);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-12">
@@ -107,42 +118,53 @@ export function StaffQueue() {
             <p role="status" aria-atomic="true" className="sr-only">{announcement}</p>
             {error && <p role="alert" className="m-4 rounded-lg bg-danger-surface p-3 text-sm font-medium text-danger">{error}</p>}
 
-            {visibleTickets.length ? (
-              <ul aria-label={view === "active" ? "Active orders" : "Collected orders"} className="grid gap-2 px-3 pb-3 sm:px-4 sm:pb-4">
-                {visibleTickets.map((ticket) => {
-                  const label = formatTicketNumber(ticket);
-                  const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
-                  return (
-                    <li key={ticket.id} className="grid grid-cols-[4.5rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-border bg-background md:grid-cols-[5.5rem_minmax(0,1fr)_auto] md:items-center">
-                      <div className="ticket-paper row-span-2 grid content-center self-stretch border-r border-dashed border-current/40 px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
-                        <span className="font-display text-3xl leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-4xl">{label}</span>
-                      </div>
-                      <div className="min-w-0 px-3 pt-3 md:px-4 md:pb-3">
-                        <Badge variant={ticket.status}>{statusLabels[ticket.status]}</Badge>
-                        {ticket.items && <p className="mt-2 text-sm leading-5 text-foreground [overflow-wrap:anywhere]">{orderSummary(ticket.items)}</p>}
-                        {ticket.notes && <p className="mt-1 text-sm leading-5 whitespace-pre-wrap text-muted-foreground [overflow-wrap:anywhere]">{ticket.notes}</p>}
-                      </div>
-                      <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-auto md:justify-end md:px-4">
-                        {isPickupOrder(ticket) && (
-                          <Button variant="outline" aria-label={`Show QR for ${label}`} onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}>
-                            <QrCode size={18} strokeWidth={1.75} aria-hidden="true" />
-                            Show QR
-                          </Button>
-                        )}
-                        {ticket.status !== "collected" && (
-                          <Button
-                            aria-label={`${action} for ${label}`}
-                            aria-disabled={pendingId !== null}
-                            onClick={(event) => void advanceTicket(ticket, document.activeElement === event.currentTarget)}
-                          >
-                            {pendingId === ticket.id ? "Saving…" : action}
-                          </Button>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+            {visibleSections.length ? (
+              <div className="grid gap-5 px-3 pb-3 sm:gap-6 sm:px-4 sm:pb-4">
+                {visibleSections.map(({ label: sectionLabel, orders }) => (
+                  <div key={sectionLabel}>
+                    {view === "active" && (
+                      <h2 className="mb-2 flex items-center gap-3 text-sm font-semibold after:h-px after:flex-1 after:bg-border">
+                        {sectionLabel}
+                      </h2>
+                    )}
+                    <ul aria-label={sectionLabel} className="grid gap-2">
+                      {orders.map((ticket) => {
+                        const label = formatTicketNumber(ticket);
+                        const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
+                        return (
+                          <li key={ticket.id} className="grid grid-cols-[4.5rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-border bg-background md:grid-cols-[5.5rem_minmax(0,1fr)_auto] md:items-center">
+                            <div className="ticket-paper row-span-2 grid content-center self-stretch border-r border-dashed border-current/40 px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
+                              <span className="font-display text-3xl leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-4xl">{label}</span>
+                            </div>
+                            <div className="min-w-0 px-3 pt-3 md:px-4 md:pb-3">
+                              <Badge variant={ticket.status}>{statusLabels[ticket.status]}</Badge>
+                              {ticket.items && <p className="mt-2 text-sm leading-5 text-foreground [overflow-wrap:anywhere]">{orderSummary(ticket.items)}</p>}
+                              {ticket.notes && <p className="mt-1 text-sm leading-5 whitespace-pre-wrap text-muted-foreground [overflow-wrap:anywhere]">{ticket.notes}</p>}
+                            </div>
+                            <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-auto md:justify-end md:px-4">
+                              {isPickupOrder(ticket) && (
+                                <Button variant="outline" aria-label={`Show QR for ${label}`} onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}>
+                                  <QrCode size={18} strokeWidth={1.75} aria-hidden="true" />
+                                  Show QR
+                                </Button>
+                              )}
+                              {ticket.status !== "collected" && (
+                                <Button
+                                  aria-label={`${action} for ${label}`}
+                                  aria-disabled={pendingId !== null}
+                                  onClick={(event) => void advanceTicket(ticket, event.currentTarget)}
+                                >
+                                  {pendingId === ticket.id ? "Saving…" : action}
+                                </Button>
+                              )}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="border-t border-border px-6 py-10 text-center">
                 <ClipboardList size={20} strokeWidth={1.75} className="mx-auto text-primary" aria-hidden="true" />
