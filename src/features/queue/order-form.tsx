@@ -77,7 +77,7 @@ export function OrderForm({ busy, error, onCreate }: {
         <span>Notes <span className="font-normal text-muted-foreground">(optional)</span></span>
         <textarea className={`${fieldClass} resize-y py-2.5`} rows={2} maxLength={orderLimits.notes} value={notes} disabled={busy} onChange={(event) => setNotes(event.target.value)} />
       </label>
-      {(validationError || error) && <p role="alert" className="rounded-lg bg-danger-surface p-3 text-sm text-danger">{validationError || error}</p>}
+      {(validationError || error) && <p role="alert" className="rounded-lg border border-border p-3 text-sm text-danger">{validationError || error}</p>}
       <div className="flex justify-end">
         <Button type="submit" disabled={busy}>{busy ? "Creating…" : "Create order"}</Button>
       </div>

@@ -1,28 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
-  --background: #211b22;
-  --foreground: #fbf1e8;
-  --card: #2b242c;
-  --muted: #40343e;
-  --muted-foreground: #cdbdc7;
-  --border: #51444e;
-  --primary: #efb7c7;
-  --primary-hover: #f8ced9;
-  --primary-foreground: #281d26;
-  --ring: #f3c6d4;
-  --waiting-surface: #50313e;
-  --waiting-ink: #ffdae4;
-  --ready-surface: #233e30;
-  --ready-ink: #bfebd0;
-  --danger: #ffd4cf;
-  --danger-surface: #552f34;
-  --paper-cream: #f7ecde;
-  --paper-pink: #efb7c7;
-  --paper-green: #276447;
-  --paper-collected: #dfd4c9;
-  --paper-ink: #2a2028;
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #211b22;
+  --card: #ffffff;
+  --muted: #f3f2f3;
+  --muted-foreground: #625960;
+  --border: #d9d4d8;
+  --primary: #211b22;
+  --primary-hover: #40343e;
+  --primary-foreground: #ffffff;
+  --ring: #51444e;
+  --waiting-ink: #745426;
+  --pickup-alert: #276447;
+  --danger: #972e36;
 }
 
 @theme inline {
@@ -38,43 +30,23 @@
   --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-ring: var(--ring);
-  --color-waiting-surface: var(--waiting-surface);
   --color-waiting-ink: var(--waiting-ink);
-  --color-ready-surface: var(--ready-surface);
-  --color-ready-ink: var(--ready-ink);
+  --color-pickup-alert: var(--pickup-alert);
   --color-danger: var(--danger);
-  --color-danger-surface: var(--danger-surface);
-  --color-paper-cream: var(--paper-cream);
-  --color-paper-ink: var(--paper-ink);
 }
 
 @layer components {
-  .ticket-paper {
+  .ticket-edge {
     position: relative;
-    background: var(--paper, var(--paper-cream));
-    color: var(--paper-ink);
-    color-scheme: light;
-  }
-
-  .ticket-paper[data-tone="waiting"] {
-    --paper: var(--paper-pink);
-  }
-
-  .ticket-paper[data-tone="ready"] {
-    --paper: var(--paper-green);
-    color: var(--foreground);
-    color-scheme: dark;
-  }
-
-  .ticket-paper[data-tone="collected"] {
-    --paper: var(--paper-collected);
+    border: 1px solid var(--border);
+    background: var(--card);
   }
 
   .ticket-edge::after {
     position: absolute;
-    inset: 100% 0 auto;
+    inset: calc(100% - 1px) 0 auto;
     height: 0.375rem;
-    background: radial-gradient(circle at center top, var(--paper, var(--paper-cream)) 0.3125rem, transparent 0.375rem)
+    background: radial-gradient(circle at center top, var(--card) 0.25rem, var(--border) 0.28rem 0.33rem, transparent 0.375rem)
       center top / 0.75rem 0.375rem repeat-x;
     content: "";
     pointer-events: none;
@@ -91,29 +63,32 @@
     inset-block-start: -0.5rem;
     width: 0.5rem;
     height: 1rem;
+    border: 1px solid var(--border);
     background: var(--background);
     content: "";
     pointer-events: none;
   }
 
   .ticket-seam::before {
-    inset-inline-start: 0;
+    inset-inline-start: -1px;
+    border-inline-start: 0;
     border-radius: 0 1rem 1rem 0;
   }
 
   .ticket-seam::after {
-    inset-inline-end: 0;
+    inset-inline-end: -1px;
+    border-inline-end: 0;
     border-radius: 1rem 0 0 1rem;
   }
 
   .landing-stub {
-    border-top: 1px dashed color-mix(in srgb, var(--paper-ink) 48%, transparent);
+    border-top: 1px dashed color-mix(in srgb, var(--foreground) 48%, transparent);
   }
 
   @media (min-width: 48rem) {
     .landing-stub {
       border-top: 0;
-      border-inline-start: 1px dashed color-mix(in srgb, var(--paper-ink) 48%, transparent);
+      border-inline-start: 1px dashed color-mix(in srgb, var(--foreground) 48%, transparent);
     }
   }
 }

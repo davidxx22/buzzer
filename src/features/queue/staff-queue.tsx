@@ -105,7 +105,7 @@ export function StaffQueue() {
               </Button>
             </div>
             <p role="status" aria-atomic="true" className="sr-only">{announcement}</p>
-            {error && <p role="alert" className="m-4 rounded-lg bg-danger-surface p-3 text-sm font-medium text-danger">{error}</p>}
+            {error && <p role="alert" className="m-4 rounded-lg border border-border p-3 text-sm font-medium text-danger">{error}</p>}
 
             {visibleTickets.length ? (
               <ul aria-label={view === "active" ? "Active orders" : "Collected orders"} className="grid gap-2 px-3 pb-3 sm:px-4 sm:pb-4">
@@ -114,7 +114,7 @@ export function StaffQueue() {
                   const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
                   return (
                     <li key={ticket.id} className="grid grid-cols-[4.5rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-border bg-background md:grid-cols-[5.5rem_minmax(0,1fr)_auto] md:items-center">
-                      <div className="ticket-paper row-span-2 grid content-center self-stretch border-r border-dashed border-current/40 px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
+                      <div className="row-span-2 grid content-center self-stretch border-r border-dashed border-current/40 px-2 py-3 text-center md:row-span-1">
                         <span className="font-display text-3xl leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-4xl">{label}</span>
                       </div>
                       <div className="min-w-0 px-3 pt-3 md:px-4 md:pb-3">

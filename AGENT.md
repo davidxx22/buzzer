@@ -20,4 +20,5 @@ Buzzer is a restaurant queue and order pickup demo. Use fictional orders. The Ve
 
 - Run `npm run typecheck` and `npm run build`, then follow the pickup walkthrough in [README.md](README.md).
 - Keep [CHECKLIST.md](CHECKLIST.md) current. Mark a verification step complete when there is a passing result.
+- After verifying Buzzer changes, commit and push them to the GitHub repository unless the user asks to keep them local.
 - On **PAUSE**, stop development immediately. Use the current files and checklist as the handoff. On **CONTINUE**, inspect the current files and checklist, then resume from the first unfinished step.

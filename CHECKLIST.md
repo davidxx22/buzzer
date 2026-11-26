@@ -19,7 +19,7 @@
 - [x] Verify the hosted ticket relay from Waiting to Ready to Collected in two separate browsers.
 - [ ] Run the pickup check with a physical phone on the same Wi-Fi.
 - [x] Verify desktop and 375px mobile layouts, keyboard focus, and collected orders.
-- [x] Verify the ticket-themed landing page and staff queue, plus the live pink Waiting, green Ready, and neutral Collected ticket states.
+- [x] Verify white landing, staff, and ticket backgrounds and confirm that the green pickup alert appears only while the live order is ready.
 
 ## Later phases
 
