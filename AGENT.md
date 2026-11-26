@@ -13,7 +13,7 @@ Buzzer is a restaurant queue and order pickup demo. Use fictional orders. The Ve
 
 - Staff create waiting orders with their own pickup numbers and QR tickets. Staff move waiting tickets to `ready`, then `collected`. Repeat or stale actions leave the current state intact.
 - The Wi-Fi demo serves statuses from shared storage. Browser preview status updates stay within one browser profile.
-- Preserve visible status text, keyboard access to queue actions, and accessible status announcements. Label ticket alerts as simulated.
+- Preserve visible status text, keyboard access to queue actions, and accessible status announcements. Show the simulated pickup alert automatically on an open live ticket when that order is ready.
 
 ## Verify and resume
 

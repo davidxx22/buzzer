@@ -15,7 +15,7 @@
 - [x] Type checking passes.
 - [x] The production build exports the home, staff, and pickup ticket routes.
 - [x] The Matcha and Iced latte tickets update independently across browser sessions in the shared demo.
-- [x] An enabled simulated alert appears when the correct order is ready.
+- [x] A simulated alert appears automatically when the correct order is ready.
 - [ ] Run the pickup check with a physical phone on the same Wi-Fi.
 - [x] Verify desktop and 375px mobile layouts, keyboard focus, and collected orders.
 

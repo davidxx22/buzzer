@@ -30,7 +30,7 @@ npm run demo:shared
 Use a private Wi-Fi network and fictional orders. Connect both devices to that network. Open the printed Wi-Fi address on the cashier device so the QR contains an address the phone can reach.
 
 1. In **Staff**, select **New order**. Create **#01** with one **Matcha coffee**, then **#02** with one **Iced latte**. Use **Add item** when an order includes more than one item.
-2. Reopen **Show QR** for **#01** and scan it with the phone camera. Confirm the ticket shows **#01**, **1 × Matcha coffee**, and **Waiting**. Select **Enable alerts** and keep the ticket open.
+2. Reopen **Show QR** for **#01** and scan it with the phone camera. Confirm the ticket shows **#01**, **1 × Matcha coffee**, and **Waiting**. Keep the ticket open. Pickup alerts appear automatically on this page.
 3. Mark **#02** ready first. The matcha ticket stays **Waiting**.
 4. Mark **#01** ready. The phone shows **Ready for pickup** and a **Simulated pickup alert**. Mark it collected and confirm it moves to **Collected orders**.
 

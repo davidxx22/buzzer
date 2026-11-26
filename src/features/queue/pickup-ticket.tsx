@@ -1,10 +1,9 @@
 "use client";
 
-import { Bell, BellRing, Ticket } from "lucide-react";
+import { BellRing, Ticket } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatTicketNumber, isOrderId, isPickupOrder, statusLabels, type PickupOrder } from "./model";
 import { QueueError } from "./queue-feedback";
@@ -42,25 +41,6 @@ export function PickupTicket() {
 
 function OrderTicket({ id, snapshot }: { id: string; snapshot: string | null }) {
   const { state, refresh } = useQueue(id);
-  const [alertsEnabled, setAlertsEnabled] = useState(false);
-  const preferenceKey = `buzzer:alerts:${id}`;
-
-  useEffect(() => {
-    try {
-      setAlertsEnabled(localStorage.getItem(preferenceKey) === "enabled");
-    } catch {
-      // The alert can still be enabled for this visit.
-    }
-  }, [preferenceKey]);
-
-  function enableAlerts() {
-    setAlertsEnabled(true);
-    try {
-      localStorage.setItem(preferenceKey, "enabled");
-    } catch {
-      // The alert can still be enabled for this visit.
-    }
-  }
 
   if (state.kind === "loading") return <TicketLoading />;
   if (state.kind === "error") return <TicketShell><QueueError onRetry={refresh} /></TicketShell>;
@@ -69,14 +49,12 @@ function OrderTicket({ id, snapshot }: { id: string; snapshot: string | null }) 
   const order = saved ?? (state.source === "browser" ? readTicketSnapshot(id, snapshot) : null);
   if (!order) return <TicketUnavailable />;
 
-  return <TicketDetails order={order} snapshotOnly={!saved} alertsEnabled={alertsEnabled} onEnableAlerts={enableAlerts} />;
+  return <TicketDetails order={order} snapshotOnly={!saved} />;
 }
 
-function TicketDetails({ order, snapshotOnly, alertsEnabled, onEnableAlerts }: {
+function TicketDetails({ order, snapshotOnly }: {
   order: PickupOrder;
   snapshotOnly: boolean;
-  alertsEnabled: boolean;
-  onEnableAlerts: () => void;
 }) {
   const ready = order.status === "ready";
   return (
@@ -93,7 +71,7 @@ function TicketDetails({ order, snapshotOnly, alertsEnabled, onEnableAlerts }: {
       <div className="mt-5 border-t border-border pt-5" role="status" aria-atomic="true">
         <Badge variant={order.status}>{ready ? "Ready for pickup" : statusLabels[order.status]}</Badge>
       </div>
-      {ready && alertsEnabled && !snapshotOnly && (
+      {ready && !snapshotOnly && (
         <div className="mt-4 flex gap-2.5 rounded-xl bg-ready-surface p-3 text-ready-ink" role="alert">
           <BellRing size={19} className="mt-0.5 shrink-0" aria-hidden="true" />
           <div>
@@ -103,16 +81,16 @@ function TicketDetails({ order, snapshotOnly, alertsEnabled, onEnableAlerts }: {
         </div>
       )}
 
-      <Button className="mt-5 w-full" variant="outline" type="button" onClick={onEnableAlerts}
-        disabled={snapshotOnly || order.status === "collected" || alertsEnabled}>
-        <Bell size={18} aria-hidden="true" />
-        {alertsEnabled && !snapshotOnly ? "Alerts enabled" : "Enable alerts"}
-      </Button>
-      <p className="mt-2 text-sm leading-5 text-muted-foreground">
-        {snapshotOnly
-          ? "This is a preview of your order. Live updates and simulated alerts on a second device require the shared demo."
-          : "Alerts are simulated. Keep this ticket open to see your pickup alert."}
-      </p>
+      {snapshotOnly && (
+        <p className="mt-3 text-sm leading-5 text-muted-foreground">
+          This is a preview of your order. Live pickup alerts on a second device require the shared Wi-Fi demo.
+        </p>
+      )}
+      {!snapshotOnly && order.status === "waiting" && (
+        <p className="mt-3 text-sm leading-5 text-muted-foreground">
+          Keep this ticket open. A simulated pickup alert will appear here when your order is ready.
+        </p>
+      )}
     </TicketShell>
   );
 }
