@@ -85,7 +85,7 @@ export function StaffQueue() {
     .filter(({ orders }) => orders.length > 0);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-12">
+    <Card className="mx-auto my-8 w-[calc(100%-2rem)] max-w-[68rem] p-3 sm:my-12 sm:w-[calc(100%-4rem)] sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-5xl leading-none font-semibold sm:text-6xl">Order queue</h1>
@@ -101,13 +101,13 @@ export function StaffQueue() {
       </div>
 
       {state.kind === "loading" && <p role="status" className="mt-6 text-muted-foreground">Loading the queue…</p>}
-      {state.kind === "error" && <Card className="mt-6 p-5"><QueueError onRetry={refresh} /></Card>}
+      {state.kind === "error" && <div className="mt-6"><QueueError onRetry={refresh} /></div>}
       {state.kind === "loaded" && (
         <>
           <div className="mt-6"><QueueCounts tickets={tickets} /></div>
 
-          <Card className="mt-6">
-            <div className="flex flex-wrap gap-2 p-3 sm:px-4 sm:py-4">
+          <div className="mt-6 border-t border-border pt-4">
+            <div className="mb-4 flex flex-wrap gap-2">
               <Button ref={activeFilter} variant={view === "active" ? "default" : "ghost"} aria-pressed={view === "active"} onClick={() => setView("active")}>
                 Active orders
               </Button>
@@ -116,10 +116,10 @@ export function StaffQueue() {
               </Button>
             </div>
             <p role="status" aria-atomic="true" className="sr-only">{announcement}</p>
-            {error && <p role="alert" className="m-4 rounded-lg bg-danger-surface p-3 text-sm font-medium text-danger">{error}</p>}
+            {error && <p role="alert" className="mb-4 rounded-lg bg-danger-surface p-3 text-sm font-medium text-danger">{error}</p>}
 
             {visibleSections.length ? (
-              <div className="grid gap-5 px-3 pb-3 sm:gap-6 sm:px-4 sm:pb-4">
+              <div className="grid gap-5 sm:gap-6">
                 {visibleSections.map(({ label: sectionLabel, orders }) => (
                   <div key={sectionLabel}>
                     {view === "active" && (
@@ -166,7 +166,7 @@ export function StaffQueue() {
                 ))}
               </div>
             ) : (
-              <div className="border-t border-border px-6 py-10 text-center">
+              <div className="rounded-lg border border-border bg-background px-6 py-10 text-center">
                 <ClipboardList size={20} strokeWidth={1.75} className="mx-auto text-primary" aria-hidden="true" />
                 <p className="mt-3 font-bold">{view === "active" ? "No active orders" : "No collected orders yet"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -174,7 +174,7 @@ export function StaffQueue() {
                 </p>
               </div>
             )}
-          </Card>
+          </div>
         </>
       )}
       {dialog && (
@@ -186,6 +186,6 @@ export function StaffQueue() {
           )}
         </Dialog>
       )}
-    </div>
+    </Card>
   );
 }

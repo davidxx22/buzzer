@@ -21,6 +21,7 @@
 - [x] Verify desktop and 375px mobile layouts, keyboard focus, and collected orders.
 - [x] Verify the ticket-themed landing page and staff queue, plus the live pink Waiting, green Ready, and neutral Collected ticket states.
 - [x] Verify ready orders move above the waiting section and keep keyboard focus in Active orders.
+- [x] Verify the heading, counts, and order lists fit inside one staff queue card on desktop and mobile.
 
 ## Later phases
 
