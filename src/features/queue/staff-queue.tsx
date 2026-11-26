@@ -1,17 +1,21 @@
 "use client";
 
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, Plus, QrCode } from "lucide-react";
 import { useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { updateTicketStatus } from "./browser-store";
-import { formatTicketNumber, nextStatus, statusLabels, type QueueTicket } from "./model";
+import { Dialog } from "@/components/ui/dialog";
+import { formatTicketNumber, isPickupOrder, nextStatus, orderSummary, statusLabels, type OrderDetails, type OrderSource, type PickupOrder, type QueueTicket } from "./model";
+import { OrderForm } from "./order-form";
+import { OrderQr } from "./order-qr";
+import { advanceOrder, createOrder } from "./order-store";
 import { QueueCounts } from "./queue-counts";
 import { QueueError } from "./queue-feedback";
 import { useQueue } from "./use-queue";
 
 type QueueView = "active" | "collected";
+type QueueDialog = { kind: "create" } | { kind: "qr"; order: PickupOrder; source: OrderSource };
 
 export function StaffQueue() {
   const { state, refresh } = useQueue();
@@ -19,6 +23,9 @@ export function StaffQueue() {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [error, setError] = useState("");
+  const [dialog, setDialog] = useState<QueueDialog | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
   const activeFilter = useRef<HTMLButtonElement>(null);
 
   async function advanceTicket(ticket: QueueTicket, restoreFocus: boolean) {
@@ -30,19 +37,36 @@ export function StaffQueue() {
     setError("");
 
     try {
-      const updated = await updateTicketStatus(ticket.id, next);
-      const label = formatTicketNumber(ticket.number);
+      const updated = await advanceOrder(ticket.id, next);
+      const label = formatTicketNumber(ticket);
       if (updated) {
         setAnnouncement(`${label} marked ${next}.`);
         if (next === "collected" && restoreFocus) activeFilter.current?.focus();
       } else {
-        refresh();
-        setError(`${label} changed in another tab. The queue has been refreshed.`);
+        setError(`${label} already changed. The queue has been refreshed.`);
       }
+      await refresh();
     } catch {
-      setError("The update couldn’t be saved. Check your browser storage and try again.");
+      setError("The update couldn’t be saved. Check your connection or browser storage and try again.");
     } finally {
       setPendingId(null);
+    }
+  }
+
+  async function submitOrder(id: string, details: OrderDetails) {
+    if (isCreating || state.kind !== "loaded") return;
+    setIsCreating(true);
+    setCreateError("");
+    try {
+      const order = await createOrder(id, details);
+      setView("active");
+      setAnnouncement(`Order ${formatTicketNumber(order)} created.`);
+      setDialog({ kind: "qr", order, source: state.source });
+      await refresh();
+    } catch {
+      setCreateError("The order couldn’t be saved. Check your connection or browser storage and try again.");
+    } finally {
+      setIsCreating(false);
     }
   }
 
@@ -51,7 +75,16 @@ export function StaffQueue() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-12">
-      <h1 className="text-3xl font-[760] tracking-tight sm:text-4xl">Order queue</h1>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <h1 className="text-3xl font-[760] tracking-tight sm:text-4xl">Order queue</h1>
+        <Button type="button" disabled={state.kind !== "loaded"} onClick={() => {
+          setCreateError("");
+          setDialog({ kind: "create" });
+        }}>
+          <Plus size={18} aria-hidden="true" />
+          New order
+        </Button>
+      </div>
       <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Mark orders ready for pickup, then close the ticket when they’re collected.</p>
 
       {state.kind === "loading" && <p role="status" className="mt-6 text-muted-foreground">Loading the queue…</p>}
@@ -75,23 +108,34 @@ export function StaffQueue() {
             {visibleTickets.length ? (
               <ul aria-label={view === "active" ? "Active orders" : "Collected orders"} className="divide-y divide-border">
                 {visibleTickets.map((ticket) => {
-                  const label = formatTicketNumber(ticket.number);
+                  const label = formatTicketNumber(ticket);
                   const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
                   return (
-                    <li key={ticket.id} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2.5 px-4 py-3.5 sm:grid-cols-[1fr_9rem_10rem] sm:px-5">
-                      <span className="text-lg font-bold tabular-nums">{label}</span>
+                    <li key={ticket.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2.5 px-4 py-3.5 sm:grid-cols-[minmax(0,1fr)_6rem_16.5rem] sm:px-5">
+                      <div className="min-w-0">
+                        <p className="text-lg font-bold tabular-nums">{label}</p>
+                        {ticket.items && <p className="mt-0.5 break-words text-sm text-muted-foreground">{orderSummary(ticket.items)}</p>}
+                        {ticket.notes && <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-muted-foreground">{ticket.notes}</p>}
+                      </div>
                       <Badge variant={ticket.status}>{statusLabels[ticket.status]}</Badge>
-                      {ticket.status !== "collected" && (
-                        <Button
-                          variant={ticket.status === "ready" ? "default" : "outline"}
-                          className="col-span-2 sm:col-span-1 sm:justify-self-end"
-                          aria-label={`${action} for ${label}`}
-                          aria-disabled={pendingId !== null}
-                          onClick={(event) => void advanceTicket(ticket, document.activeElement === event.currentTarget)}
-                        >
-                          {pendingId === ticket.id ? "Saving…" : action}
-                        </Button>
-                      )}
+                      <div className="col-span-2 flex flex-wrap gap-2 sm:col-span-1 sm:justify-end">
+                        {isPickupOrder(ticket) && (
+                          <Button variant="outline" aria-label={`Show QR for ${label}`} onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}>
+                            <QrCode size={16} aria-hidden="true" />
+                            Show QR
+                          </Button>
+                        )}
+                        {ticket.status !== "collected" && (
+                          <Button
+                            variant={ticket.status === "ready" ? "default" : "outline"}
+                            aria-label={`${action} for ${label}`}
+                            aria-disabled={pendingId !== null}
+                            onClick={(event) => void advanceTicket(ticket, document.activeElement === event.currentTarget)}
+                          >
+                            {pendingId === ticket.id ? "Saving…" : action}
+                          </Button>
+                        )}
+                      </div>
                     </li>
                   );
                 })}
@@ -101,12 +145,21 @@ export function StaffQueue() {
                 <ClipboardList size={28} className="mx-auto text-primary" aria-hidden="true" />
                 <p className="mt-3 font-bold">{view === "active" ? "No active orders" : "No collected orders yet"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {view === "active" ? "All orders in this demo queue have been collected." : "Tickets appear here once they’re marked collected."}
+                  {view === "active" ? "Select New order to add a pickup ticket." : "Tickets appear here once they’re marked collected."}
                 </p>
               </div>
             )}
           </Card>
         </>
+      )}
+      {dialog && (
+        <Dialog title={dialog.kind === "create" ? "New order" : "Pickup QR"} busy={isCreating} onDismiss={() => setDialog(null)}>
+          {dialog.kind === "create" ? (
+            <OrderForm busy={isCreating} error={createError} onCreate={(id, details) => void submitOrder(id, details)} />
+          ) : (
+            <OrderQr order={dialog.order} source={dialog.source} />
+          )}
+        </Dialog>
       )}
     </div>
   );

@@ -8,7 +8,7 @@ export function QueueError({ onRetry }: { onRetry: () => void }) {
         <CircleAlert className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
         <div>
           <p className="font-semibold">The demo queue couldn’t load.</p>
-          <p className="mt-1 text-sm">Check that site storage is available in this browser, then try again.</p>
+          <p className="mt-1 text-sm">Check your connection and browser site storage, then try again.</p>
         </div>
       </div>
       <Button variant="outline" onClick={onRetry}>Try again</Button>

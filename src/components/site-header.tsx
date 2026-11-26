@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
-  const isStaffPage = usePathname().replace(/\/$/, "") === "/staff";
+  const pathname = usePathname().replace(/\/$/, "");
+  const isStaffPage = pathname === "/staff";
 
   return (
     <header className="border-b border-border bg-card">
@@ -17,7 +18,7 @@ export function SiteHeader() {
           </span>
           <span className="text-xl">Buzzer</span>
         </Link>
-        <nav aria-label="Main navigation">
+        {pathname !== "/ticket" && <nav aria-label="Main navigation">
           <Link
             href="/staff"
             aria-current={isStaffPage ? "page" : undefined}
@@ -28,7 +29,7 @@ export function SiteHeader() {
           >
             Staff
           </Link>
-        </nav>
+        </nav>}
       </div>
     </header>
   );

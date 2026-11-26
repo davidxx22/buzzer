@@ -1,21 +1,22 @@
 # Working on Buzzer
 
-Buzzer is a frontend demo for a restaurant queue and order pickup workflow. Use fictional tickets in the staff view. Backend integration, staff authentication, Web Push, SMS, and hosting belong to later phases.
+Buzzer is a restaurant queue and order pickup demo. Use fictional orders. The Vercel preview uses browser storage and the Wi-Fi demo uses a local shared service. Production backend integration, staff authentication, Web Push, and SMS belong to later phases.
 
 ## Folder conventions
 
 - `src/app` contains the routes, layout, and shared theme. Keep route files thin.
 - `src/components/ui` contains reusable interface primitives. Use the theme tokens in `src/app/globals.css` for colors, focus, and status styling.
-- `src/features/queue` contains the staff screen, typed model, fixtures, and browser store. Keep storage and status transitions in that feature so the staff view can later use a shared backend without rewriting its UI.
+- `src/features/queue` contains the staff and pickup ticket screens, typed model, and order store client. Keep order validation and status transitions in the typed model so the browser store and shared service use the same rules.
+- `scripts/shared-demo.mjs` serves the static export and persists fictional orders on one Wi-Fi demo host.
 
 ## Queue behavior
 
-- Staff move waiting tickets to `ready`, then `collected`. Repeat or stale actions leave the current state intact.
-- The browser store keeps the current status. Staff see the same tickets in tabs on the same origin and browser profile.
-- Preserve visible text for all statuses, keyboard access to queue actions, and a live region for changes on the staff page.
+- Staff create waiting orders with their own pickup numbers and QR tickets. Staff move waiting tickets to `ready`, then `collected`. Repeat or stale actions leave the current state intact.
+- The Wi-Fi demo serves statuses from shared storage. Browser preview status updates stay within one browser profile.
+- Preserve visible status text, keyboard access to queue actions, and accessible status announcements. Label ticket alerts as simulated.
 
 ## Verify and resume
 
-- Run `npm run typecheck` and `npm run build`, then follow the two-tab walkthrough in [README.md](README.md).
+- Run `npm run typecheck` and `npm run build`, then follow the pickup walkthrough in [README.md](README.md).
 - Keep [CHECKLIST.md](CHECKLIST.md) current. Mark a verification step complete when there is a passing result.
 - On **PAUSE**, stop development immediately. Use the current files and checklist as the handoff. On **CONTINUE**, inspect the current files and checklist, then resume from the first unfinished step.

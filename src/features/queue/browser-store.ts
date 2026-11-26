@@ -1,23 +1,11 @@
-import { DEMO_QUEUE } from "./fixtures";
-import { nextStatus, type QueueTicket, type TicketStatus } from "./model";
+import { isPickupOrder, isQueueTicket, newPickupOrder, nextStatus, type OrderDetails, type QueueTicket, type TicketStatus } from "./model";
 
 const STORAGE_KEY = "buzzer:demo-queue:v1";
 const UPDATE_EVENT = "buzzer:queue-updated";
 
-function isQueueTicket(value: unknown): value is QueueTicket {
-  if (!value || typeof value !== "object") return false;
-
-  const { id, number, status } = value as Partial<QueueTicket>;
-  return (
-    typeof id === "string" && id.length > 0 &&
-    typeof number === "number" && Number.isSafeInteger(number) && number > 0 &&
-    (status === "waiting" || status === "ready" || status === "collected")
-  );
-}
-
 export function readQueue(): QueueTicket[] {
   const saved = window.localStorage.getItem(STORAGE_KEY);
-  if (saved === null) return DEMO_QUEUE;
+  if (saved === null) return [];
 
   const data: unknown = JSON.parse(saved);
   if (!Array.isArray(data) || !data.every(isQueueTicket)) {
@@ -48,6 +36,18 @@ function saveQueue(tickets: QueueTicket[]) {
 
 async function changeQueue<T>(change: () => T): Promise<T> {
   return navigator.locks ? navigator.locks.request(STORAGE_KEY, change) : change();
+}
+
+export function createBrowserOrder(id: string, details: OrderDetails) {
+  return changeQueue(() => {
+    const tickets = readQueue();
+    const existing = tickets.find((ticket) => ticket.id === id);
+    if (existing && isPickupOrder(existing)) return existing;
+
+    const order = newPickupOrder(tickets, id, details);
+    saveQueue([...tickets, order]);
+    return order;
+  });
 }
 
 export function updateTicketStatus(id: string, status: TicketStatus) {
