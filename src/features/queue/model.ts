@@ -1,4 +1,5 @@
-export type TicketStatus = "waiting" | "ready" | "collected";
+export const ticketStatuses = ["waiting", "ready", "collected"] as const;
+export type TicketStatus = (typeof ticketStatuses)[number];
 
 export type OrderItem = { name: string; quantity: number };
 export type OrderDetails = { items: OrderItem[]; notes: string };
@@ -16,6 +17,7 @@ export type OrderSource = "browser" | "shared";
 
 export const orderLimits = { items: 8, name: 60, quantity: 99, notes: 240 };
 export const ordersEndpoint = "/api/orders/";
+export const ticketStatusEndpoint = "/api/ticket-status";
 
 export const statusLabels: Record<TicketStatus, string> = {
   waiting: "Waiting",
@@ -35,6 +37,10 @@ export function isOrderId(value: unknown): value is string {
   return typeof value === "string" && /^[a-f0-9]{32}$/.test(value);
 }
 
+export function isTicketStatus(value: unknown): value is TicketStatus {
+  return ticketStatuses.some((status) => status === value);
+}
+
 export function isOrderDetails(value: unknown): value is OrderDetails {
   if (!value || typeof value !== "object") return false;
 
@@ -52,7 +58,7 @@ export function isQueueTicket(value: unknown): value is QueueTicket {
   const { id, number, status, items, notes } = value as Partial<QueueTicket>;
   return typeof id === "string" && id.length > 0 &&
     typeof number === "number" && Number.isSafeInteger(number) && number > 0 &&
-    (status === "waiting" || status === "ready" || status === "collected") &&
+    isTicketStatus(status) &&
     (items === undefined && notes === undefined || isOrderId(id) && isOrderDetails(value));
 }
 

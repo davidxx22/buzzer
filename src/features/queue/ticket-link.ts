@@ -1,6 +1,6 @@
 import { isPickupOrder, isQueueTicket, type OrderSource, type PickupOrder } from "./model";
 
-export function getTicketUrl(order: PickupOrder, source: OrderSource) {
+export function getTicketUrl(order: PickupOrder, source: OrderSource, liveId?: string | null) {
   const url = new URL("/ticket/", window.location.origin);
   url.searchParams.set("order", order.id);
   if (source === "browser") {
@@ -8,6 +8,7 @@ export function getTicketUrl(order: PickupOrder, source: OrderSource) {
     const bytes = new TextEncoder().encode(JSON.stringify(snapshot));
     const encoded = btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     url.searchParams.set("preview", encoded);
+    if (liveId) url.searchParams.set("live", liveId);
   }
   return url;
 }

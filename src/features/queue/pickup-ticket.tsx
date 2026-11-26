@@ -2,12 +2,13 @@
 
 import { BellRing, Ticket } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { formatTicketNumber, isOrderId, isPickupOrder, statusLabels, type PickupOrder } from "./model";
+import { formatTicketNumber, isOrderId, isPickupOrder, statusLabels, ticketStatuses, type PickupOrder, type TicketStatus } from "./model";
 import { QueueError } from "./queue-feedback";
 import { readTicketSnapshot } from "./ticket-link";
+import { readTicketStatus } from "./ticket-status";
 import { useQueue } from "./use-queue";
 
 function TicketShell({ children }: { children: ReactNode }) {
@@ -36,27 +37,76 @@ export function PickupTicket() {
   const id = params.get("order");
   if (!isOrderId(id)) return <TicketUnavailable />;
 
-  return <OrderTicket key={id} id={id} snapshot={params.get("preview")} />;
+  const liveId = params.get("live");
+  return <OrderTicket key={id} id={id} snapshot={params.get("preview")} liveId={isOrderId(liveId) ? liveId : null} />;
 }
 
-function OrderTicket({ id, snapshot }: { id: string; snapshot: string | null }) {
+function OrderTicket({ id, snapshot, liveId }: { id: string; snapshot: string | null; liveId: string | null }) {
   const { state, refresh } = useQueue(id);
 
   if (state.kind === "loading") return <TicketLoading />;
   if (state.kind === "error") return <TicketShell><QueueError onRetry={refresh} /></TicketShell>;
 
   const saved = state.tickets.find(isPickupOrder);
-  const order = saved ?? (state.source === "browser" ? readTicketSnapshot(id, snapshot) : null);
+  if (saved) return <TicketDetails order={saved} connection="live" />;
+
+  const order = state.source === "browser" ? readTicketSnapshot(id, snapshot) : null;
   if (!order) return <TicketUnavailable />;
 
-  return <TicketDetails order={order} snapshotOnly={!saved} />;
+  return liveId
+    ? <HostedTicket key={liveId} order={order} liveId={liveId} />
+    : <TicketDetails order={order} connection="snapshot" />;
 }
 
-function TicketDetails({ order, snapshotOnly }: {
+type TicketConnection = "live" | "snapshot" | "connecting" | "unavailable";
+
+function HostedTicket({ order, liveId }: { order: PickupOrder; liveId: string }) {
+  const [result, setResult] = useState<{ status: TicketStatus; connection: TicketConnection }>({
+    status: order.status,
+    connection: "connecting",
+  });
+
+  useEffect(() => {
+    let active = true;
+    let inFlight = false;
+    let collected = false;
+    async function poll() {
+      if (!active || document.hidden || inFlight || collected) return;
+      inFlight = true;
+      try {
+        const status = await readTicketStatus(order.id, liveId);
+        if (!active) return;
+        collected = status === "collected";
+        setResult((previous) => ({
+          status: ticketStatuses.indexOf(status) >= ticketStatuses.indexOf(previous.status) ? status : previous.status,
+          connection: "live",
+        }));
+      } catch {
+        if (active) setResult((previous) => ({ ...previous, connection: "unavailable" }));
+      } finally {
+        inFlight = false;
+      }
+    }
+
+    void poll();
+    const interval = window.setInterval(poll, 2500);
+    document.addEventListener("visibilitychange", poll);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", poll);
+    };
+  }, [liveId, order.id]);
+
+  return <TicketDetails order={{ ...order, status: result.status }} connection={result.connection} />;
+}
+
+function TicketDetails({ order, connection }: {
   order: PickupOrder;
-  snapshotOnly: boolean;
+  connection: TicketConnection;
 }) {
   const ready = order.status === "ready";
+  const statusLabel = ready ? "Ready for pickup" : statusLabels[order.status];
   return (
     <TicketShell>
       <div className="flex items-center gap-2 font-semibold text-primary">
@@ -69,9 +119,11 @@ function TicketDetails({ order, snapshotOnly }: {
       </ul>
 
       <div className="mt-5 border-t border-border pt-5" role="status" aria-atomic="true">
-        <Badge variant={order.status}>{ready ? "Ready for pickup" : statusLabels[order.status]}</Badge>
+        {connection === "connecting"
+          ? <p className="text-sm text-muted-foreground">Checking live status…</p>
+          : <Badge variant={order.status}>{connection === "live" ? statusLabel : `Last known · ${statusLabel}`}</Badge>}
       </div>
-      {ready && !snapshotOnly && (
+      {ready && connection === "live" && (
         <div className="mt-4 flex gap-2.5 rounded-xl bg-ready-surface p-3 text-ready-ink" role="alert">
           <BellRing size={19} className="mt-0.5 shrink-0" aria-hidden="true" />
           <div>
@@ -81,12 +133,17 @@ function TicketDetails({ order, snapshotOnly }: {
         </div>
       )}
 
-      {snapshotOnly && (
+      {connection === "snapshot" && (
         <p className="mt-3 text-sm leading-5 text-muted-foreground">
-          This is a preview of your order. Live pickup alerts on a second device require the shared Wi-Fi demo.
+          This link shows a snapshot. Ask staff to reopen Show QR and scan the new code for live updates.
         </p>
       )}
-      {!snapshotOnly && order.status === "waiting" && (
+      {connection === "unavailable" && (
+        <p className="mt-3 text-sm leading-5 text-muted-foreground">
+          Live updates are unavailable. Check your connection or ask staff to reopen Show QR.
+        </p>
+      )}
+      {connection === "live" && order.status === "waiting" && (
         <p className="mt-3 text-sm leading-5 text-muted-foreground">
           Keep this ticket open. A simulated pickup alert will appear here when your order is ready.
         </p>

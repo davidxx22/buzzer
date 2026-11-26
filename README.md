@@ -18,7 +18,13 @@ npm run typecheck
 npm run build
 ```
 
-## Test with a cashier device and a phone
+## Test on the hosted demo
+
+Open [Buzzer Staff](https://buzzerrr.vercel.app/staff/), create an order, and scan its QR with a phone. Keep the ticket open while staff mark the order ready and collected. The phone updates automatically and shows a simulated alert when the order is ready.
+
+The cashier’s browser keeps the order. Vercel’s temporary cache shares its status with the phone, so this demo needs no database. Reopen **Show QR** to publish the current status if a live link has expired or the original QR was created before live updates were added.
+
+## Test on a local Wi-Fi network
 
 Use Node.js 24 for the shared demo. Run these commands from the project root.
 
@@ -36,8 +42,6 @@ Use a private Wi-Fi network and fictional orders. Connect both devices to that n
 
 The shared demo saves orders in `.buzzer/orders.json` between restarts. Pickup numbers start at **#01** for a fresh queue.
 
-## Try the Vercel preview
-
-The hosted preview stores orders in the browser that created them. Two tabs in the same browser profile stay in sync. Scanning from another device opens a snapshot of the exact order. Use the shared demo for live cross-device updates. Alerts are simulated on the open ticket in both modes. Old Customer and Owner links open the Staff queue.
+Old Customer and Owner links open the Staff queue.
 
 See [CHECKLIST.md](CHECKLIST.md) for progress and [AGENT.md](AGENT.md) for development conventions.

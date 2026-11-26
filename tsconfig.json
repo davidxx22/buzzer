@@ -29,6 +29,7 @@
     "allowJs": true
   },
   "include": [
+    "api/**/*.ts",
     "next-env.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
