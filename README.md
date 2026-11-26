@@ -20,6 +20,8 @@ npm run build
 
 ## Try the staff workflow
 
+On the Vercel deployment, old Customer and Owner links open the staff queue.
+
 1. Open **Staff** in two tabs on the same origin and browser profile.
 2. Find a waiting ticket in **Active orders** and select **Mark ready**. Confirm the ticket shows **Ready** in both tabs.
 3. Select **Mark collected** and check **Collected orders** in both tabs for the ticket.

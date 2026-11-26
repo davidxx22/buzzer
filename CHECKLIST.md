@@ -11,7 +11,7 @@
 ## Verification
 
 - [x] Type checking passes.
-- [x] The production build exports the home and staff routes. The former Customer and Owner URLs return 404.
+- [x] The production build exports the home and staff routes.
 - [x] Ready and collected updates appear in two staff tabs and persist after reloading.
 - [x] Empty queues show clear status text.
 - [x] Verify desktop and 375px mobile layouts, keyboard focus, and updates in the staff page’s accessible status region.
