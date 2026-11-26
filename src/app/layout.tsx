@@ -4,16 +4,16 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "Buzzer", template: "%s | Buzzer" },
-  description: "Join the queue, follow your ticket, and collect your order when it’s ready.",
+  description: "Manage the restaurant order queue and mark orders ready for pickup or collected.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="print:bg-white">
+      <body>
         <a
           href="#main-content"
-          className="sr-only z-10 rounded-lg bg-card p-3 text-primary focus:not-sr-only focus:absolute focus:top-2 focus:left-2 print:hidden"
+          className="sr-only z-10 rounded-lg bg-card p-3 text-primary focus:not-sr-only focus:absolute focus:top-2 focus:left-2"
         >
           Skip to content
         </a>

@@ -50,18 +50,6 @@ async function changeQueue<T>(change: () => T): Promise<T> {
   return navigator.locks ? navigator.locks.request(STORAGE_KEY, change) : change();
 }
 
-export function joinQueue() {
-  return changeQueue(() => {
-    const tickets = readQueue();
-    const lastNumber = tickets.reduce((largest, ticket) => Math.max(largest, ticket.number), 100);
-    const id = crypto.randomUUID?.() ?? crypto.getRandomValues(new Uint32Array(4)).join("-");
-    const ticket: QueueTicket = { id, number: lastNumber + 1, status: "waiting" };
-
-    saveQueue([...tickets, ticket]);
-    return ticket;
-  });
-}
-
 export function updateTicketStatus(id: string, status: TicketStatus) {
   return changeQueue(() => {
     const tickets = readQueue();

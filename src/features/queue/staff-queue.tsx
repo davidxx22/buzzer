@@ -101,7 +101,7 @@ export function StaffQueue() {
                 <ClipboardList size={28} className="mx-auto text-primary" aria-hidden="true" />
                 <p className="mt-3 font-bold">{view === "active" ? "No active orders" : "No collected orders yet"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {view === "active" ? "New tickets will appear here as customers join." : "Tickets appear here once they’re marked collected."}
+                  {view === "active" ? "All orders in this demo queue have been collected." : "Tickets appear here once they’re marked collected."}
                 </p>
               </div>
             )}
