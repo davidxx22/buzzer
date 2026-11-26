@@ -27,7 +27,7 @@ export function OrderQr({ order, source }: { order: PickupOrder; source: OrderSo
 
   return (
     <div className="flex flex-col items-center gap-3 text-center">
-      <p className="text-4xl font-bold tabular-nums tracking-tight">{pickup}</p>
+      <p className="font-mono text-4xl font-semibold tabular-nums tracking-tight">{pickup}</p>
       <p className="break-words text-sm text-muted-foreground">{orderSummary(order.items)}</p>
       {order.notes && <p className="max-w-full break-words text-sm text-muted-foreground">{order.notes}</p>}
       {qr === null && <p role="status" className="text-sm text-muted-foreground">Preparing pickup QR…</p>}

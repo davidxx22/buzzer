@@ -76,16 +76,16 @@ export function StaffQueue() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-12">
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <h1 className="text-3xl font-[760] tracking-tight sm:text-4xl">Order queue</h1>
+        <h1 className="text-[2rem] leading-tight font-medium tracking-tight sm:text-4xl">Order queue</h1>
         <Button type="button" disabled={state.kind !== "loaded"} onClick={() => {
           setCreateError("");
           setDialog({ kind: "create" });
         }}>
-          <Plus size={18} aria-hidden="true" />
+          <Plus size={16} strokeWidth={1.5} aria-hidden="true" />
           New order
         </Button>
       </div>
-      <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Mark orders ready for pickup, then close the ticket when they’re collected.</p>
+      <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Create pickup tickets and mark orders ready or collected</p>
 
       {state.kind === "loading" && <p role="status" className="mt-6 text-muted-foreground">Loading the queue…</p>}
       {state.kind === "error" && <Card className="mt-6 p-5"><QueueError onRetry={refresh} /></Card>}
@@ -94,11 +94,11 @@ export function StaffQueue() {
           <div className="mt-6"><QueueCounts tickets={tickets} /></div>
 
           <Card className="mt-5">
-            <div className="flex flex-wrap gap-2 border-b border-border p-3 sm:px-5">
-              <Button ref={activeFilter} variant={view === "active" ? "default" : "ghost"} aria-pressed={view === "active"} onClick={() => setView("active")}>
+            <div className="flex flex-wrap gap-2 border-b border-border p-3">
+              <Button ref={activeFilter} variant="ghost" className="aria-pressed:bg-muted aria-pressed:text-foreground" aria-pressed={view === "active"} onClick={() => setView("active")}>
                 Active orders
               </Button>
-              <Button variant={view === "collected" ? "default" : "ghost"} aria-pressed={view === "collected"} onClick={() => setView("collected")}>
+              <Button variant="ghost" className="aria-pressed:bg-muted aria-pressed:text-foreground" aria-pressed={view === "collected"} onClick={() => setView("collected")}>
                 Collected orders
               </Button>
             </div>
@@ -111,23 +111,24 @@ export function StaffQueue() {
                   const label = formatTicketNumber(ticket);
                   const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
                   return (
-                    <li key={ticket.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2.5 px-4 py-3.5 sm:grid-cols-[minmax(0,1fr)_6rem_16.5rem] sm:px-5">
+                    <li key={ticket.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_6rem_16rem] sm:px-5">
                       <div className="min-w-0">
-                        <p className="text-lg font-bold tabular-nums">{label}</p>
-                        {ticket.items && <p className="mt-0.5 break-words text-sm text-muted-foreground">{orderSummary(ticket.items)}</p>}
-                        {ticket.notes && <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-muted-foreground">{ticket.notes}</p>}
+                        <p className="font-mono text-lg font-semibold tabular-nums">{label}</p>
+                        {ticket.items && <p className="mt-1 break-words text-sm text-muted-foreground">{orderSummary(ticket.items)}</p>}
+                        {ticket.notes && <p className="mt-1 whitespace-pre-wrap break-words text-sm text-muted-foreground">{ticket.notes}</p>}
                       </div>
                       <Badge variant={ticket.status}>{statusLabels[ticket.status]}</Badge>
-                      <div className="col-span-2 flex flex-wrap gap-2 sm:col-span-1 sm:justify-end">
+                      <div className="col-span-2 grid grid-cols-2 gap-2 sm:col-span-1">
                         {isPickupOrder(ticket) && (
-                          <Button variant="outline" aria-label={`Show QR for ${label}`} onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}>
-                            <QrCode size={16} aria-hidden="true" />
+                          <Button variant="ghost" className="col-start-1 row-start-1 px-2" aria-label={`Show QR for ${label}`} onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}>
+                            <QrCode size={16} strokeWidth={1.5} aria-hidden="true" />
                             Show QR
                           </Button>
                         )}
                         {ticket.status !== "collected" && (
                           <Button
-                            variant={ticket.status === "ready" ? "default" : "outline"}
+                            variant="outline"
+                            className="col-start-2 row-start-1 px-2"
                             aria-label={`${action} for ${label}`}
                             aria-disabled={pendingId !== null}
                             onClick={(event) => void advanceTicket(ticket, document.activeElement === event.currentTarget)}
@@ -142,10 +143,10 @@ export function StaffQueue() {
               </ul>
             ) : (
               <div className="px-6 py-10 text-center">
-                <ClipboardList size={28} className="mx-auto text-primary" aria-hidden="true" />
-                <p className="mt-3 font-bold">{view === "active" ? "No active orders" : "No collected orders yet"}</p>
+                <ClipboardList size={16} strokeWidth={1.5} className="mx-auto text-muted-foreground" aria-hidden="true" />
+                <p className="mt-3 font-medium">{view === "active" ? "No active orders" : "No collected orders yet"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {view === "active" ? "Select New order to add a pickup ticket." : "Tickets appear here once they’re marked collected."}
+                  {view === "active" ? "Select New order to add a pickup ticket" : "Tickets appear here once they’re marked collected"}
                 </p>
               </div>
             )}

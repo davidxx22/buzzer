@@ -9,6 +9,7 @@
 - [x] Document local setup, the demo walkthrough, and project conventions.
 - [x] Add itemized orders, per-order QR codes, and mobile pickup tickets.
 - [x] Add a shared Wi-Fi demo mode and simulated pickup alerts.
+- [x] Give the home page, Staff queue, and phone ticket a consistent pickup receipt design.
 
 ## Verification
 
