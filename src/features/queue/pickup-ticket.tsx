@@ -26,7 +26,7 @@ export function TicketLoading() {
 function TicketUnavailable() {
   return (
     <TicketShell>
-      <h1 className="text-xl font-medium">Pickup ticket unavailable</h1>
+      <h1 className="text-xl font-bold">Pickup ticket unavailable</h1>
       <p className="mt-2 leading-6 text-muted-foreground">Ask the cashier to show the QR for your order again.</p>
     </TicketShell>
   );
@@ -109,26 +109,26 @@ function TicketDetails({ order, connection }: {
   const statusLabel = ready ? "Ready for pickup" : statusLabels[order.status];
   return (
     <TicketShell>
-      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-        <Ticket size={16} strokeWidth={1.5} aria-hidden="true" />
+      <div className="flex items-center gap-2 font-semibold text-primary">
+        <Ticket size={19} aria-hidden="true" />
         Pickup ticket
       </div>
-      <h1 className="mt-3 font-mono text-6xl leading-none font-semibold tabular-nums tracking-tight">{formatTicketNumber(order)}</h1>
-      <ul className="mt-4 space-y-1 break-words text-base leading-6">
+      <h1 className="mt-2 text-5xl font-bold tracking-tight tabular-nums">{formatTicketNumber(order)}</h1>
+      <ul className="mt-4 space-y-1 break-words text-lg">
         {order.items.map(({ name, quantity }, index) => <li key={index}>{quantity} × {name}</li>)}
       </ul>
 
-      <div className="pickup-divider mt-5 pt-4" role="status" aria-atomic="true">
+      <div className="mt-5 border-t border-border pt-5" role="status" aria-atomic="true">
         {connection === "connecting"
           ? <p className="text-sm text-muted-foreground">Checking live status…</p>
           : <Badge variant={order.status}>{connection === "live" ? statusLabel : `Last known · ${statusLabel}`}</Badge>}
       </div>
       {ready && connection === "live" && (
-        <div className="mt-4 flex gap-2 rounded-lg bg-ready-surface p-3 text-ready-ink" role="alert">
-          <BellRing size={16} strokeWidth={1.5} className="mt-1 shrink-0" aria-hidden="true" />
+        <div className="mt-4 flex gap-2.5 rounded-xl bg-ready-surface p-3 text-ready-ink" role="alert">
+          <BellRing size={19} className="mt-0.5 shrink-0" aria-hidden="true" />
           <div>
-            <p className="text-sm font-medium">Show this ticket at the pickup counter</p>
-            <p className="mt-1 text-xs">Simulated pickup alert</p>
+            <p className="text-sm font-semibold">Simulated pickup alert</p>
+            <p className="text-sm">Your order is ready for pickup.</p>
           </div>
         </div>
       )}

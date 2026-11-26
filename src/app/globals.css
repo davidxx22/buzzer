@@ -2,12 +2,12 @@
 
 :root {
   color-scheme: light;
-  --background: #f6f5f1;
-  --foreground: #202822;
+  --background: #f3f6f5;
+  --foreground: #162621;
   --card: #ffffff;
-  --muted: #eeeee8;
-  --muted-foreground: #535c54;
-  --border: #dddfd7;
+  --muted: #e9efec;
+  --muted-foreground: #4d6259;
+  --border: #d6e1db;
   --primary: #175445;
   --primary-hover: #103e33;
   --primary-foreground: #ffffff;
@@ -18,7 +18,6 @@
   --ready-ink: #16512f;
   --danger: #9a2e2a;
   --danger-surface: #fff0ed;
-  --receipt-paper: #fffcf4;
 }
 
 @theme inline {
@@ -39,33 +38,6 @@
   --color-ready-ink: var(--ready-ink);
   --color-danger: var(--danger);
   --color-danger-surface: var(--danger-surface);
-  --ease-control: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@layer components {
-  .pickup-preview {
-    background-color: #16473b;
-    color: #dce8e0;
-  }
-
-  .pickup-paper {
-    border-radius: 8px 8px 0 0;
-    background-color: var(--receipt-paper);
-    color: var(--foreground);
-    filter: drop-shadow(0 12px 24px rgb(0 0 0 / 18%));
-  }
-
-  .pickup-paper::after {
-    position: absolute;
-    inset: 100% 0 auto;
-    height: 8px;
-    background: conic-gradient(from 135deg at 50% 0, transparent 25%, var(--receipt-paper) 0) 0 0 / 12px 8px repeat-x;
-    content: "";
-  }
-
-  .pickup-divider {
-    border-top: 1px dashed var(--border);
-  }
 }
 
 @layer base {
