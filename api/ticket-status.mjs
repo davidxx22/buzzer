@@ -1,12 +1,14 @@
+// @ts-check
 import { createHash } from "node:crypto";
 import { getCache } from "@vercel/functions";
-import { isOrderId, isTicketStatus, ticketStatuses } from "../src/features/queue/model";
+import { isOrderId, isTicketStatus, ticketStatuses } from "../src/features/queue/ticket-rules.mjs";
 
 const ttl = 12 * 60 * 60;
 const headers = { "Cache-Control": "no-store" };
 
 export default {
-  async fetch(request: Request) {
+  /** @param {Request} request */
+  async fetch(request) {
     const cache = getCache({
       namespace: "buzzer-ticket-status-v1",
       keyHashFunction: (key) => createHash("sha256").update(key).digest("hex"),
@@ -27,7 +29,7 @@ export default {
       if (request.method === "POST") {
         const secret = request.headers.get("Authorization")?.match(/^Bearer ([a-f0-9]{64})$/)?.[1];
         if (!secret) return new Response(null, { status: 401, headers });
-        const body = await request.json().catch(() => null) as { orderId?: unknown; status?: unknown } | null;
+        const body = await request.json().catch(() => null);
         const orderId = body?.orderId;
         const status = body?.status;
         if (!isOrderId(orderId) || !isTicketStatus(status)) return new Response(null, { status: 400, headers });

@@ -1,4 +1,6 @@
-export const ticketStatuses = ["waiting", "ready", "collected"] as const;
+import { isOrderId, isTicketStatus, ticketStatuses } from "./ticket-rules.mjs";
+
+export { isOrderId, isTicketStatus, ticketStatuses };
 export type TicketStatus = (typeof ticketStatuses)[number];
 
 export type OrderItem = { name: string; quantity: number };
@@ -31,14 +33,6 @@ export function formatTicketNumber(ticket: QueueTicket) {
 
 export function orderSummary(items: OrderItem[]) {
   return items.map(({ name, quantity }) => `${quantity} × ${name}`).join(" · ");
-}
-
-export function isOrderId(value: unknown): value is string {
-  return typeof value === "string" && /^[a-f0-9]{32}$/.test(value);
-}
-
-export function isTicketStatus(value: unknown): value is TicketStatus {
-  return ticketStatuses.some((status) => status === value);
 }
 
 export function isOrderDetails(value: unknown): value is OrderDetails {

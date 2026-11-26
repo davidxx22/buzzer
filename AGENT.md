@@ -8,7 +8,7 @@ Buzzer is a restaurant queue and order pickup demo. Use fictional orders. The Ve
 - `src/components/ui` contains reusable interface primitives. Use the theme tokens in `src/app/globals.css` for colors, focus, and status styling.
 - `src/features/queue` contains the staff and pickup ticket screens, typed model, and order store client. Keep order validation and status transitions in the typed model so the browser store and shared service use the same rules.
 - `scripts/shared-demo.mjs` serves the static export and persists fictional orders on one Wi-Fi demo host.
-- `api/ticket-status.ts` publishes and reads temporary ticket statuses for the hosted demo.
+- `api/ticket-status.mjs` publishes and reads temporary ticket statuses for the hosted demo.
 
 ## Queue behavior
 
