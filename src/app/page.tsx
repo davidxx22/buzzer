@@ -1,27 +1,34 @@
-import { ClipboardList } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16">
-      <section className="overflow-hidden rounded-[1.5rem] bg-foreground px-6 py-10 text-white sm:px-10 sm:py-14">
-        <div className="max-w-xl">
-          <h1 className="text-4xl font-[760] tracking-tight sm:text-6xl">The digital buzzer</h1>
-          <p className="mt-4 max-w-md text-base leading-7 text-[#c4d6ce] sm:text-lg">A queue and pickup demo for restaurants and cafés.</p>
+    <div className="mx-auto max-w-6xl px-4 pt-8 pb-12 sm:px-8 sm:pt-16 md:pt-20">
+      <section className="grid md:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]" aria-labelledby="home-heading">
+        <div className="ticket-paper relative px-6 py-10 sm:px-10 sm:py-12 md:px-14 md:py-20">
+          <h1 id="home-heading" className="max-w-[11ch] font-display text-6xl leading-[0.89] font-semibold tracking-tight sm:text-7xl lg:text-[6.5rem]">
+            The digital buzzer
+          </h1>
+          <p className="mt-6 max-w-[32ch] text-base leading-6 sm:text-lg sm:leading-7">
+            Create a pickup ticket for each order. Customers scan it to see when their order is ready.
+          </p>
+          <Button asChild size="large" className="mt-8 bg-paper-ink text-paper-cream outline-[#772c49] hover:bg-[#513745]">
+            <Link href="/staff">Open staff view</Link>
+          </Button>
         </div>
+
+        <figure className="ticket-paper ticket-edge landing-stub flex flex-col justify-center px-6 py-8 sm:px-10 md:px-12" data-tone="waiting">
+          <figcaption className="text-sm font-semibold">Example pickup ticket</figcaption>
+          <p className="mt-3 font-display text-7xl leading-none font-semibold tabular-nums sm:text-8xl lg:text-[8rem]">#01</p>
+          <p className="mt-3 text-base">1 × Iced latte</p>
+          <div className="mt-5 border-t border-dashed border-paper-ink/45 pt-4">
+            <p className="inline-flex items-center gap-2 text-sm font-semibold">
+              <span className="size-2 rounded-full bg-current" aria-hidden="true" />
+              Waiting
+            </p>
+          </div>
+        </figure>
       </section>
-      <Card className="mt-5 flex flex-col items-start p-6 sm:p-7">
-        <div className="grid size-11 place-items-center rounded-xl bg-muted text-primary">
-          <ClipboardList size={21} aria-hidden="true" />
-        </div>
-        <h2 className="mt-4 text-xl font-bold tracking-tight">Staff view</h2>
-        <p className="mt-2 max-w-sm leading-6 text-muted-foreground">See the active queue and mark each order ready or collected.</p>
-        <Button asChild className="mt-5">
-          <Link href="/staff">Open staff view</Link>
-        </Button>
-      </Card>
     </div>
   );
 }

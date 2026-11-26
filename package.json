@@ -9,6 +9,7 @@
     "demo:shared": "node scripts/shared-demo.mjs"
   },
   "dependencies": {
+    "@fontsource/barlow-condensed": "^5.3.0",
     "@radix-ui/react-slot": "^1.2.4",
     "@vercel/functions": "^3.11.4",
     "class-variance-authority": "^0.7.1",

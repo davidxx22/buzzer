@@ -3,31 +3,37 @@
 import { BellRing, Ticket } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { formatTicketNumber, isOrderId, isPickupOrder, statusLabels, ticketStatuses, type PickupOrder, type TicketStatus } from "./model";
 import { QueueError } from "./queue-feedback";
 import { readTicketSnapshot } from "./ticket-link";
 import { readTicketStatus } from "./ticket-status";
 import { useQueue } from "./use-queue";
 
-function TicketShell({ children }: { children: ReactNode }) {
+function TicketShell({ children, tone, expanded }: { children: ReactNode; tone?: TicketStatus; expanded?: boolean }) {
   return (
-    <div className="mx-auto max-w-md px-4 py-8 sm:py-12">
-      <Card className="p-6 sm:p-8">{children}</Card>
+    <div className="mx-auto max-w-lg px-4 py-6 sm:py-12">
+      <article
+        className={cn("ticket-paper ticket-edge", expanded && "flex min-h-[min(36rem,calc(100svh-7rem))] flex-col")}
+        data-tone={tone}
+      >
+        {children}
+      </article>
     </div>
   );
 }
 
 export function TicketLoading() {
-  return <TicketShell><p role="status" className="text-muted-foreground">Loading your ticket…</p></TicketShell>;
+  return <TicketShell><p role="status" className="p-6 sm:p-8">Loading your ticket…</p></TicketShell>;
 }
 
 function TicketUnavailable() {
   return (
     <TicketShell>
-      <h1 className="text-xl font-bold">Pickup ticket unavailable</h1>
-      <p className="mt-2 leading-6 text-muted-foreground">Ask the cashier to show the QR for your order again.</p>
+      <div className="p-6 sm:p-8">
+        <h1 className="font-display text-4xl leading-none font-semibold">Pickup ticket unavailable</h1>
+        <p className="mt-3 leading-6">Ask the cashier to show the QR for your order again.</p>
+      </div>
     </TicketShell>
   );
 }
@@ -45,7 +51,9 @@ function OrderTicket({ id, snapshot, liveId }: { id: string; snapshot: string | 
   const { state, refresh } = useQueue(id);
 
   if (state.kind === "loading") return <TicketLoading />;
-  if (state.kind === "error") return <TicketShell><QueueError onRetry={refresh} /></TicketShell>;
+  if (state.kind === "error") {
+    return <div className="mx-auto max-w-lg px-4 py-6 sm:py-12"><QueueError onRetry={refresh} /></div>;
+  }
 
   const saved = state.tickets.find(isPickupOrder);
   if (saved) return <TicketDetails order={saved} connection="live" />;
@@ -107,46 +115,48 @@ function TicketDetails({ order, connection }: {
 }) {
   const ready = order.status === "ready";
   const statusLabel = ready ? "Ready for pickup" : statusLabels[order.status];
+  const showAlert = ready && connection === "live";
+  const showWaiting = order.status === "waiting" && connection === "live";
+  const hasFooter = showAlert || showWaiting || connection === "snapshot" || connection === "unavailable";
+
   return (
-    <TicketShell>
-      <div className="flex items-center gap-2 font-semibold text-primary">
-        <Ticket size={19} aria-hidden="true" />
-        Pickup ticket
-      </div>
-      <h1 className="mt-2 text-5xl font-bold tracking-tight tabular-nums">{formatTicketNumber(order)}</h1>
-      <ul className="mt-4 space-y-1 break-words text-lg">
-        {order.items.map(({ name, quantity }, index) => <li key={index}>{quantity} × {name}</li>)}
-      </ul>
-
-      <div className="mt-5 border-t border-border pt-5" role="status" aria-atomic="true">
-        {connection === "connecting"
-          ? <p className="text-sm text-muted-foreground">Checking live status…</p>
-          : <Badge variant={order.status}>{connection === "live" ? statusLabel : `Last known · ${statusLabel}`}</Badge>}
-      </div>
-      {ready && connection === "live" && (
-        <div className="mt-4 flex gap-2.5 rounded-xl bg-ready-surface p-3 text-ready-ink" role="alert">
-          <BellRing size={19} className="mt-0.5 shrink-0" aria-hidden="true" />
-          <div>
-            <p className="text-sm font-semibold">Simulated pickup alert</p>
-            <p className="text-sm">Your order is ready for pickup.</p>
-          </div>
+    <TicketShell tone={connection === "live" ? order.status : undefined} expanded={hasFooter || connection === "connecting"}>
+      <div className="flex-1 px-6 pt-6 pb-8 sm:px-8 sm:pt-8">
+        <p className="flex items-center gap-2 text-sm font-semibold">
+          <Ticket size={18} strokeWidth={1.75} aria-hidden="true" />
+          Pickup ticket
+        </p>
+        <h1 className="mt-6 font-display text-[clamp(4rem,19vw,7.5rem)] leading-[0.86] font-semibold tabular-nums [overflow-wrap:anywhere]">
+          {formatTicketNumber(order)}
+        </h1>
+        <div role="status" aria-atomic="true" className="mt-4">
+          {connection === "live" ? (
+            <p className="font-display text-4xl leading-[0.95] font-semibold sm:text-5xl">{statusLabel}</p>
+          ) : (
+            <p className="text-sm font-semibold">
+              {connection === "connecting" ? "Checking live status…" : `Last known · ${statusLabel}`}
+            </p>
+          )}
         </div>
-      )}
-
-      {connection === "snapshot" && (
-        <p className="mt-3 text-sm leading-5 text-muted-foreground">
-          This link shows a snapshot. Ask staff to reopen Show QR and scan the new code for live updates.
-        </p>
-      )}
-      {connection === "unavailable" && (
-        <p className="mt-3 text-sm leading-5 text-muted-foreground">
-          Live updates are unavailable. Check your connection or ask staff to reopen Show QR.
-        </p>
-      )}
-      {connection === "live" && order.status === "waiting" && (
-        <p className="mt-3 text-sm leading-5 text-muted-foreground">
-          Keep this ticket open. A simulated pickup alert will appear here when your order is ready.
-        </p>
+        <ul aria-label="Order items" className="mt-6 space-y-1 text-base leading-6 [overflow-wrap:anywhere] sm:text-lg">
+          {order.items.map(({ name, quantity }, index) => <li key={index}>{quantity} × {name}</li>)}
+        </ul>
+      </div>
+      {hasFooter && (
+        <div className="ticket-seam px-6 py-5 text-sm leading-6 sm:px-8 sm:py-6">
+          {showAlert && (
+            <div className="flex gap-3" role="alert">
+              <BellRing size={18} strokeWidth={1.75} className="mt-1 shrink-0" aria-hidden="true" />
+              <div>
+                <p className="text-base font-semibold">Show this ticket at the pickup counter</p>
+                <p className="mt-1">Simulated pickup alert</p>
+              </div>
+            </div>
+          )}
+          {showWaiting && <p>Keep this ticket open. A simulated pickup alert will appear here when your order is ready.</p>}
+          {connection === "snapshot" && <p>This link shows a snapshot. Ask staff to reopen Show QR and scan the new code for live updates.</p>}
+          {connection === "unavailable" && <p>Live updates are unavailable. Check your connection or ask staff to reopen Show QR.</p>}
+        </div>
       )}
     </TicketShell>
   );

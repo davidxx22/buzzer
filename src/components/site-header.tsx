@@ -11,12 +11,10 @@ export function SiteHeader() {
 
   return (
     <header className="border-b border-border bg-card">
-      <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-8">
-        <Link href="/" className="flex min-h-11 items-center gap-2 rounded-lg font-[760] tracking-tight">
-          <span className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground sm:size-8">
-            <BellRing size={17} aria-hidden="true" />
-          </span>
-          <span className="text-xl">Buzzer</span>
+      <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-8">
+        <Link href="/" className="flex min-h-11 items-center gap-2.5 rounded-lg">
+          <BellRing size={19} strokeWidth={1.75} className="text-primary" aria-hidden="true" />
+          <span className="font-display text-2xl leading-none font-semibold">Buzzer</span>
         </Link>
         {pathname !== "/ticket" && <nav aria-label="Main navigation">
           <Link

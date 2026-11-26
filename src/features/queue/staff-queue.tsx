@@ -75,17 +75,19 @@ export function StaffQueue() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-12">
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <h1 className="text-3xl font-[760] tracking-tight sm:text-4xl">Order queue</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="font-display text-5xl leading-none font-semibold sm:text-6xl">Order queue</h1>
+          <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Mark orders ready for pickup, then close each ticket when it’s collected.</p>
+        </div>
         <Button type="button" disabled={state.kind !== "loaded"} onClick={() => {
           setCreateError("");
           setDialog({ kind: "create" });
         }}>
-          <Plus size={18} aria-hidden="true" />
+          <Plus size={18} strokeWidth={1.75} aria-hidden="true" />
           New order
         </Button>
       </div>
-      <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Mark orders ready for pickup, then close the ticket when they’re collected.</p>
 
       {state.kind === "loading" && <p role="status" className="mt-6 text-muted-foreground">Loading the queue…</p>}
       {state.kind === "error" && <Card className="mt-6 p-5"><QueueError onRetry={refresh} /></Card>}
@@ -93,8 +95,8 @@ export function StaffQueue() {
         <>
           <div className="mt-6"><QueueCounts tickets={tickets} /></div>
 
-          <Card className="mt-5">
-            <div className="flex flex-wrap gap-2 border-b border-border p-3 sm:px-5">
+          <Card className="mt-6">
+            <div className="flex flex-wrap gap-2 p-3 sm:px-4 sm:py-4">
               <Button ref={activeFilter} variant={view === "active" ? "default" : "ghost"} aria-pressed={view === "active"} onClick={() => setView("active")}>
                 Active orders
               </Button>
@@ -106,28 +108,29 @@ export function StaffQueue() {
             {error && <p role="alert" className="m-4 rounded-lg bg-danger-surface p-3 text-sm font-medium text-danger">{error}</p>}
 
             {visibleTickets.length ? (
-              <ul aria-label={view === "active" ? "Active orders" : "Collected orders"} className="divide-y divide-border">
+              <ul aria-label={view === "active" ? "Active orders" : "Collected orders"} className="grid gap-2 px-3 pb-3 sm:px-4 sm:pb-4">
                 {visibleTickets.map((ticket) => {
                   const label = formatTicketNumber(ticket);
                   const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
                   return (
-                    <li key={ticket.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2.5 px-4 py-3.5 sm:grid-cols-[minmax(0,1fr)_6rem_16.5rem] sm:px-5">
-                      <div className="min-w-0">
-                        <p className="text-lg font-bold tabular-nums">{label}</p>
-                        {ticket.items && <p className="mt-0.5 break-words text-sm text-muted-foreground">{orderSummary(ticket.items)}</p>}
-                        {ticket.notes && <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-muted-foreground">{ticket.notes}</p>}
+                    <li key={ticket.id} className="grid grid-cols-[4.5rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-border bg-background md:grid-cols-[5.5rem_minmax(0,1fr)_auto] md:items-center">
+                      <div className="ticket-paper row-span-2 grid content-center self-stretch border-r border-dashed border-current/40 px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
+                        <span className="font-display text-3xl leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-4xl">{label}</span>
                       </div>
-                      <Badge variant={ticket.status}>{statusLabels[ticket.status]}</Badge>
-                      <div className="col-span-2 flex flex-wrap gap-2 sm:col-span-1 sm:justify-end">
+                      <div className="min-w-0 px-3 pt-3 md:px-4 md:pb-3">
+                        <Badge variant={ticket.status}>{statusLabels[ticket.status]}</Badge>
+                        {ticket.items && <p className="mt-2 text-sm leading-5 text-foreground [overflow-wrap:anywhere]">{orderSummary(ticket.items)}</p>}
+                        {ticket.notes && <p className="mt-1 text-sm leading-5 whitespace-pre-wrap text-muted-foreground [overflow-wrap:anywhere]">{ticket.notes}</p>}
+                      </div>
+                      <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-auto md:justify-end md:px-4">
                         {isPickupOrder(ticket) && (
                           <Button variant="outline" aria-label={`Show QR for ${label}`} onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}>
-                            <QrCode size={16} aria-hidden="true" />
+                            <QrCode size={18} strokeWidth={1.75} aria-hidden="true" />
                             Show QR
                           </Button>
                         )}
                         {ticket.status !== "collected" && (
                           <Button
-                            variant={ticket.status === "ready" ? "default" : "outline"}
                             aria-label={`${action} for ${label}`}
                             aria-disabled={pendingId !== null}
                             onClick={(event) => void advanceTicket(ticket, document.activeElement === event.currentTarget)}
@@ -141,8 +144,8 @@ export function StaffQueue() {
                 })}
               </ul>
             ) : (
-              <div className="px-6 py-10 text-center">
-                <ClipboardList size={28} className="mx-auto text-primary" aria-hidden="true" />
+              <div className="border-t border-border px-6 py-10 text-center">
+                <ClipboardList size={20} strokeWidth={1.75} className="mx-auto text-primary" aria-hidden="true" />
                 <p className="mt-3 font-bold">{view === "active" ? "No active orders" : "No collected orders yet"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {view === "active" ? "Select New order to add a pickup ticket." : "Tickets appear here once they’re marked collected."}
