@@ -10,11 +10,12 @@ import { readTicketSnapshot } from "./ticket-link";
 import { readTicketStatus } from "./ticket-status";
 import { useQueue } from "./use-queue";
 
-function TicketShell({ children, expanded }: { children: ReactNode; expanded?: boolean }) {
+function TicketShell({ children, tone, expanded }: { children: ReactNode; tone?: TicketStatus; expanded?: boolean }) {
   return (
     <div className="mx-auto max-w-lg px-4 py-6 sm:py-12">
       <article
-        className={cn("ticket-edge", expanded && "flex min-h-[min(36rem,calc(100svh-7rem))] flex-col")}
+        className={cn("ticket-paper ticket-edge", expanded && "flex min-h-[min(36rem,calc(100svh-7rem))] flex-col")}
+        data-tone={tone}
       >
         {children}
       </article>
@@ -119,7 +120,7 @@ function TicketDetails({ order, connection }: {
   const hasFooter = showAlert || showWaiting || connection === "snapshot" || connection === "unavailable";
 
   return (
-    <TicketShell expanded={hasFooter || connection === "connecting"}>
+    <TicketShell tone={connection === "live" ? order.status : undefined} expanded={hasFooter || connection === "connecting"}>
       <div className="flex-1 px-6 pt-6 pb-8 sm:px-8 sm:pt-8">
         <p className="flex items-center gap-2 text-sm font-semibold">
           <Ticket size={18} strokeWidth={1.75} aria-hidden="true" />
@@ -144,12 +145,11 @@ function TicketDetails({ order, connection }: {
       {hasFooter && (
         <div className="ticket-seam px-6 py-5 text-sm leading-6 sm:px-8 sm:py-6">
           {showAlert && (
-            <div className="flex gap-3 rounded-lg bg-pickup-alert px-4 py-4 text-white" role="alert">
+            <div className="flex gap-3" role="alert">
               <BellRing size={18} strokeWidth={1.75} className="mt-1 shrink-0" aria-hidden="true" />
               <div>
-                <p className="text-lg leading-6 font-semibold">Your order is ready</p>
-                <p className="mt-1">Show this ticket at the pickup counter.</p>
-                <p className="mt-2 text-xs">Simulated pickup alert</p>
+                <p className="text-base font-semibold">Show this ticket at the pickup counter</p>
+                <p className="mt-1">Simulated pickup alert</p>
               </div>
             </div>
           )}
