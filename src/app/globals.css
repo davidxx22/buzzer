@@ -84,8 +84,8 @@
   .staff-ticket-number::after {
     position: absolute;
     inset-block: 0;
-    inset-inline-end: -1px;
-    border-inline-end: 2px dashed var(--paper-ink);
+    inset-inline-end: 2px;
+    border-inline-end: 2px dashed #fff;
     content: "";
     pointer-events: none;
   }
