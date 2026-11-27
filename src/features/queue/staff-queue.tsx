@@ -150,7 +150,7 @@ export function StaffQueue() {
                         const label = `No. ${number}`;
                         const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
                         return (
-                          <li key={ticket.id} className="staff-ticket grid overflow-hidden rounded-lg border border-l-0 border-border bg-background md:items-center">
+                          <li key={ticket.id} className="staff-ticket grid overflow-hidden rounded-r-lg border border-l-0 border-border bg-background md:items-center">
                             <div className="ticket-paper staff-ticket-number row-span-2 grid content-center gap-px self-stretch px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
                               <span className="text-xs leading-none font-semibold">No.</span>
                               <span className="font-display text-[2.125rem] leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-[2.5rem]">{number}</span>
