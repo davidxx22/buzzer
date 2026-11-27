@@ -139,7 +139,7 @@ export function StaffQueue() {
                         const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
                         return (
                           <li key={ticket.id} className="grid grid-cols-[4.5rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-border bg-background md:grid-cols-[5.5rem_minmax(0,1fr)_auto] md:items-center">
-                            <div className="ticket-paper staff-ticket-number row-span-2 grid content-center gap-px self-stretch border-r border-dashed border-current/40 px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
+                            <div className="ticket-paper staff-ticket-number row-span-2 grid content-center gap-px self-stretch px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
                               <span className="text-xs leading-none font-semibold">No.</span>
                               <span className="font-display text-[2.125rem] leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-[2.5rem]">{number}</span>
                             </div>

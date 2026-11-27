@@ -81,6 +81,15 @@
     --paper: var(--paper-pink);
   }
 
+  .staff-ticket-number::after {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0.3125rem;
+    border-inline-end: 2px dashed currentColor;
+    content: "";
+    pointer-events: none;
+  }
+
   .staff-ticket-number[data-tone="waiting"] {
     --paper: #a4161a;
     color: var(--paper-light-ink);
