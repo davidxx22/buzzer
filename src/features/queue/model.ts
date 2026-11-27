@@ -10,6 +10,7 @@ export interface QueueTicket {
   id: string;
   number: number;
   status: TicketStatus;
+  statusStartedAt?: number;
   items?: OrderItem[];
   notes?: string;
 }
@@ -49,10 +50,11 @@ export function isOrderDetails(value: unknown): value is OrderDetails {
 export function isQueueTicket(value: unknown): value is QueueTicket {
   if (!value || typeof value !== "object") return false;
 
-  const { id, number, status, items, notes } = value as Partial<QueueTicket>;
+  const { id, number, status, statusStartedAt, items, notes } = value as Partial<QueueTicket>;
   return typeof id === "string" && id.length > 0 &&
     typeof number === "number" && Number.isSafeInteger(number) && number > 0 &&
     isTicketStatus(status) &&
+    (statusStartedAt === undefined || Number.isSafeInteger(statusStartedAt) && statusStartedAt >= 0) &&
     (items === undefined && notes === undefined || isOrderId(id) && isOrderDetails(value));
 }
 
@@ -62,11 +64,16 @@ export function isPickupOrder(ticket: QueueTicket): ticket is PickupOrder {
 
 export function newPickupOrder(queue: QueueTicket[], id: string, details: OrderDetails): PickupOrder {
   const lastNumber = queue.reduce((last, ticket) => isPickupOrder(ticket) ? Math.max(last, ticket.number) : last, 0);
-  return { ...details, id, number: lastNumber + 1, status: "waiting" };
+  return { ...details, id, number: lastNumber + 1, status: "waiting", statusStartedAt: Date.now() };
 }
 
 export function nextStatus(status: TicketStatus) {
   if (status === "waiting") return "ready";
   if (status === "ready") return "collected";
   return null;
+}
+
+export function transitionTicket(ticket: QueueTicket, status: TicketStatus): QueueTicket | null {
+  if (nextStatus(ticket.status) !== status) return null;
+  return { ...ticket, status, statusStartedAt: Date.now() };
 }

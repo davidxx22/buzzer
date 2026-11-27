@@ -1,4 +1,4 @@
-import { isPickupOrder, isQueueTicket, newPickupOrder, nextStatus, type OrderDetails, type QueueTicket, type TicketStatus } from "./model";
+import { isPickupOrder, isQueueTicket, newPickupOrder, transitionTicket, type OrderDetails, type QueueTicket, type TicketStatus } from "./model";
 import { publishTicketStatus } from "./ticket-status";
 
 const STORAGE_KEY = "buzzer:demo-queue:v1";
@@ -69,11 +69,12 @@ export function updateTicketStatus(id: string, status: TicketStatus) {
   return changeQueue(async () => {
     const tickets = readQueue();
     const ticket = tickets.find((entry) => entry.id === id);
-    if (!ticket || nextStatus(ticket.status) !== status) return false;
+    const updated = ticket && transitionTicket(ticket, status);
+    if (!updated) return false;
 
     const secret = localStorage.getItem(sharingKey(id));
     if (secret) await publishTicketStatus(id, secret, status);
-    saveQueue(tickets.map((entry) => (entry.id === id ? { ...entry, status } : entry)));
+    saveQueue(tickets.map((entry) => (entry.id === id ? updated : entry)));
     return true;
   });
 }

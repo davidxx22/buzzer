@@ -1,7 +1,7 @@
 "use client";
 
 import { ClipboardList, Plus, QrCode } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { OrderQr } from "./order-qr";
 import { advanceOrder, createOrder } from "./order-store";
 import { QueueCounts } from "./queue-counts";
 import { QueueError } from "./queue-feedback";
+import { TicketTimer } from "./ticket-timer";
 import { useQueue } from "./use-queue";
 
 type QueueView = "active" | "collected";
@@ -26,6 +27,7 @@ export function StaffQueue() {
   const [dialog, setDialog] = useState<QueueDialog | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState("");
+  const [now, setNow] = useState<number | null>(null);
   const activeFilter = useRef<HTMLButtonElement>(null);
   const orderDialog = useRef<HTMLDialogElement>(null);
 
@@ -79,6 +81,16 @@ export function StaffQueue() {
   }
 
   const tickets = state.kind === "loaded" ? state.tickets : [];
+  const hasActiveTimers = view === "active" && tickets.some((ticket) => ticket.status !== "collected" && ticket.statusStartedAt !== undefined);
+
+  useEffect(() => {
+    if (!hasActiveTimers) return;
+    const tick = () => setNow(Date.now());
+    tick();
+    const interval = window.setInterval(tick, 1000);
+    return () => window.clearInterval(interval);
+  }, [hasActiveTimers]);
+
   const sections = view === "active"
     ? [
         { label: "Ready for pickup", status: "ready" },
@@ -143,10 +155,13 @@ export function StaffQueue() {
                               <span className="text-xs leading-none font-semibold">No.</span>
                               <span className="font-display text-[2.125rem] leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-[2.5rem]">{number}</span>
                             </div>
-                            <div className="min-w-0 px-3 pt-3 md:px-4 md:pb-3">
-                              <Badge variant={ticket.status}>{statusLabels[ticket.status]}</Badge>
-                              {ticket.items && <p className="mt-2 text-sm leading-5 text-foreground [overflow-wrap:anywhere]">{orderSummary(ticket.items)}</p>}
-                              {ticket.notes && <p className="mt-1 text-sm leading-5 whitespace-pre-wrap text-muted-foreground [overflow-wrap:anywhere]">{ticket.notes}</p>}
+                            <div className="flex min-w-0 justify-between gap-2 px-3 pt-3 md:gap-4 md:px-4 md:pb-3">
+                              <div className="min-w-0">
+                                <Badge variant={ticket.status}>{statusLabels[ticket.status]}</Badge>
+                                {ticket.items && <p className="mt-2 text-sm leading-5 text-foreground [overflow-wrap:anywhere]">{orderSummary(ticket.items)}</p>}
+                                {ticket.notes && <p className="mt-1 text-sm leading-5 whitespace-pre-wrap text-muted-foreground [overflow-wrap:anywhere]">{ticket.notes}</p>}
+                              </div>
+                              <TicketTimer ticket={ticket} now={now} />
                             </div>
                             <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-auto md:justify-end md:px-4">
                               {isPickupOrder(ticket) && (

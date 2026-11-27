@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { networkInterfaces } from "node:os";
 import { extname, isAbsolute, join, relative, resolve } from "node:path";
-import { isOrderDetails, isOrderId, isPickupOrder, isQueueTicket, newPickupOrder, nextStatus, ordersEndpoint, ticketStatusEndpoint } from "../src/features/queue/model.ts";
+import { isOrderDetails, isOrderId, isPickupOrder, isQueueTicket, newPickupOrder, ordersEndpoint, ticketStatusEndpoint, transitionTicket } from "../src/features/queue/model.ts";
 import { qrConfirmationTtl } from "../src/features/queue/ticket-rules.mjs";
 
 const staticDirectory = resolve("out");
@@ -114,8 +114,9 @@ async function orderApi(request, response, url) {
   }
   const updated = await changeQueue((tickets) => {
     const ticket = tickets.find((entry) => entry.id === id);
-    if (!ticket || nextStatus(ticket.status) !== body.status) return { result: false };
-    const nextQueue = tickets.map((entry) => entry.id === id ? { ...entry, status: body.status } : entry);
+    const updated = ticket && transitionTicket(ticket, body.status);
+    if (!updated) return { result: false };
+    const nextQueue = tickets.map((entry) => entry.id === id ? updated : entry);
     return { result: true, nextQueue };
   });
   return json(response, 200, updated);
