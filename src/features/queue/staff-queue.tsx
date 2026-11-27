@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Plus, QrCode } from "lucide-react";
+import { ClipboardList, Plus } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -165,8 +165,12 @@ export function StaffQueue() {
                             </div>
                             <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-auto md:justify-end md:px-4">
                               {isPickupOrder(ticket) && (
-                                <Button variant="outline" aria-label={`Show QR for ${label}`} onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}>
-                                  <QrCode size={18} strokeWidth={1.75} aria-hidden="true" />
+                                <Button
+                                  variant="outline"
+                                  className="w-24"
+                                  aria-label={`Show QR for ${label}`}
+                                  onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}
+                                >
                                   Show QR
                                 </Button>
                               )}
