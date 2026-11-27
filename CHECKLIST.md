@@ -30,7 +30,7 @@
 - [x] Verify the business logo appears in the navbar, the dropdown opens the staff queue, and Escape closes it and returns focus to the logo.
 - [x] Verify the white dashed perforation sits 2px inside the colored number stub for Waiting, Ready, and Collected orders.
 - [x] Verify the staff tickets have a rounded side cutout and two perforation notches on desktop, with the original status colors.
-- [x] Verify the outline follows the ticket cutouts and the white dashes stop short of the notches.
+- [x] Verify the ticket cutouts have a crisp outline and the white dashes stop short of the notches.
 
 ## Later phases
 

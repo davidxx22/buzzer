@@ -86,12 +86,14 @@
     --stub-seam: calc(var(--stub-width) + 1px);
     --side-notch: 8px;
     --seam-notch: 6px;
+    --side-outline: calc(var(--side-notch) + 1px);
+    --seam-outline: calc(var(--seam-notch) + 1px);
     position: relative;
     grid-template-columns: var(--stub-width) minmax(0, 1fr);
     mask-image:
-      radial-gradient(circle at left center, transparent calc(var(--side-notch) - 1px), black var(--side-notch)),
-      radial-gradient(circle at var(--stub-seam) top, transparent calc(var(--seam-notch) - 1px), black var(--seam-notch)),
-      radial-gradient(circle at var(--stub-seam) bottom, transparent calc(var(--seam-notch) - 1px), black var(--seam-notch));
+      radial-gradient(circle at left center, transparent var(--side-notch), black var(--side-notch)),
+      radial-gradient(circle at var(--stub-seam) top, transparent var(--seam-notch), black var(--seam-notch)),
+      radial-gradient(circle at var(--stub-seam) bottom, transparent var(--seam-notch), black var(--seam-notch));
     mask-composite: intersect;
   }
 
@@ -101,9 +103,9 @@
     inset: -1px;
     z-index: 1;
     background:
-      radial-gradient(circle at left center, var(--border) var(--side-notch), transparent calc(var(--side-notch) + 1px)),
-      radial-gradient(circle at var(--stub-seam) top, var(--border) var(--seam-notch), transparent calc(var(--seam-notch) + 1px)),
-      radial-gradient(circle at var(--stub-seam) bottom, var(--border) var(--seam-notch), transparent calc(var(--seam-notch) + 1px));
+      radial-gradient(circle at left center, var(--border) var(--side-outline), transparent var(--side-outline)),
+      radial-gradient(circle at var(--stub-seam) top, var(--border) var(--seam-outline), transparent var(--seam-outline)),
+      radial-gradient(circle at var(--stub-seam) bottom, var(--border) var(--seam-outline), transparent var(--seam-outline));
     content: "";
     pointer-events: none;
   }
