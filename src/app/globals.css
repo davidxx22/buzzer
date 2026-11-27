@@ -34,8 +34,8 @@
   --muted: #f3f2f3;
   --muted-foreground: #625960;
   --border: #dedade;
-  --primary: #386641;
-  --primary-hover: #2d5234;
+  --primary: #008000;
+  --primary-hover: #006600;
   --primary-foreground: #ffffff;
   --ring: var(--primary);
   --waiting-surface: var(--muted);
