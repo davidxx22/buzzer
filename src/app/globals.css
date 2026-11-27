@@ -18,6 +18,7 @@
   --ready-ink: #bfebd0;
   --danger: #ffd4cf;
   --danger-surface: #552f34;
+  --paper-white: #fafaf9;
   --paper-cream: #f7ecde;
   --paper-pink: #efb7c7;
   --paper-green: #276447;
@@ -29,13 +30,13 @@
 .staff-theme {
   color-scheme: light;
   --foreground: #211b22;
-  --card: #ffffff;
+  --card: var(--paper-white);
   --muted: #f3f2f3;
   --muted-foreground: #625960;
   --border: #dedade;
   --primary: #008000;
   --primary-hover: #006600;
-  --primary-foreground: #ffffff;
+  --primary-foreground: var(--paper-white);
   --ring: var(--primary);
   --waiting-surface: var(--muted);
   --waiting-ink: var(--foreground);
@@ -117,7 +118,7 @@
     position: absolute;
     inset-block: calc(var(--seam-notch) + 3px);
     inset-inline-end: 2px;
-    border-inline-end: 2px dashed #fff;
+    border-inline-end: 2px dashed var(--paper-white);
     content: "";
     pointer-events: none;
   }

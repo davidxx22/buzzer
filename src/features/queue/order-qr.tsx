@@ -127,6 +127,7 @@ export function OrderQr({ order, source, onClose }: {
         <>
           <QRCodeCanvas
             value={customerUrl.href}
+            bgColor="#fafaf9"
             size={264}
             level="L"
             marginSize={4}
