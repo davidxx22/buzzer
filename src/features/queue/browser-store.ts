@@ -52,14 +52,14 @@ export function createBrowserOrder(id: string, details: OrderDetails) {
   });
 }
 
-export function shareBrowserOrder(id: string) {
+export function shareBrowserOrder(id: string, scanId: string) {
   return changeQueue(async () => {
     const order = readQueue().find((ticket) => ticket.id === id);
     if (!order || !isPickupOrder(order)) throw new Error("The order is no longer in this queue.");
 
     const savedSecret = localStorage.getItem(sharingKey(id));
     const secret = savedSecret ?? Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("");
-    const liveId = await publishTicketStatus(id, secret, order.status, !savedSecret);
+    const liveId = await publishTicketStatus(id, secret, order.status, !savedSecret, scanId);
     if (liveId && !savedSecret) localStorage.setItem(sharingKey(id), secret);
     return { order, liveId };
   });

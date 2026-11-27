@@ -2,7 +2,8 @@ import { createServer } from "node:http";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { networkInterfaces } from "node:os";
 import { extname, isAbsolute, join, relative, resolve } from "node:path";
-import { isOrderDetails, isOrderId, isPickupOrder, isQueueTicket, newPickupOrder, nextStatus, ordersEndpoint } from "../src/features/queue/model.ts";
+import { isOrderDetails, isOrderId, isPickupOrder, isQueueTicket, newPickupOrder, nextStatus, ordersEndpoint, ticketStatusEndpoint } from "../src/features/queue/model.ts";
+import { qrConfirmationTtl } from "../src/features/queue/ticket-rules.mjs";
 
 const staticDirectory = resolve("out");
 const dataDirectory = resolve(process.env.BUZZER_DATA_DIR ?? ".buzzer");
@@ -25,6 +26,13 @@ if (!Array.isArray(savedQueue) || !savedQueue.every(isQueueTicket)) throw new Er
 
 let queue = savedQueue;
 let pendingWrites = Promise.resolve();
+const pickupQrs = new Map();
+
+setInterval(() => {
+  for (const [key, qr] of pickupQrs) {
+    if (qr.expiresAt <= Date.now()) pickupQrs.delete(key);
+  }
+}, qrConfirmationTtl * 1000).unref();
 
 function changeQueue(change) {
   const update = pendingWrites.then(async () => {
@@ -113,6 +121,36 @@ async function orderApi(request, response, url) {
   return json(response, 200, updated);
 }
 
+async function pickupQrApi(request, response, url) {
+  if (request.method !== "GET" && request.method !== "POST") {
+    return json(response, 405, { error: "Unsupported method." });
+  }
+
+  const body = request.method === "POST" ? await readJson(request) : null;
+  const orderId = request.method === "GET" ? url.searchParams.get("order") : body?.orderId;
+  const scanId = request.method === "GET" ? url.searchParams.get("scan") : body?.scanId;
+  if (!isOrderId(orderId) || !isOrderId(scanId)) return json(response, 400, { error: "Invalid pickup QR." });
+
+  const key = `${orderId}:${scanId}`;
+  const qr = pickupQrs.get(key);
+  const pending = qr && qr.expiresAt > Date.now();
+  if (request.method === "GET") return json(response, 200, { opened: Boolean(pending && qr.opened) });
+
+  if (body.action === "prepare-qr") {
+    if (!queue.some((order) => order.id === orderId && isPickupOrder(order))) {
+      return json(response, 404, { error: "Order not found." });
+    }
+    if (!pending) pickupQrs.set(key, { expiresAt: Date.now() + qrConfirmationTtl * 1000, opened: false });
+  } else if (body.action === "qr-opened") {
+    if (!pending) return json(response, 404, { error: "Pickup QR expired." });
+    qr.opened = true;
+  } else {
+    return json(response, 400, { error: "Invalid pickup QR action." });
+  }
+
+  response.writeHead(204, { "Cache-Control": "no-store" }).end();
+}
+
 async function servePage(response, pathname) {
   if (pathname === "/") {
     response.writeHead(200, { "Content-Type": mime[".html"] });
@@ -141,6 +179,7 @@ const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url, "http://localhost");
     if (url.pathname === ordersEndpoint) return await orderApi(request, response, url);
+    if (url.pathname === ticketStatusEndpoint) return await pickupQrApi(request, response, url);
     const redirect = redirects.find(({ source }) => source === url.pathname);
     if (redirect || url.pathname === "/staff" || url.pathname === "/ticket") {
       response.writeHead(307, { Location: redirect?.destination ?? url.pathname + "/" + url.search });

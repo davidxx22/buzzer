@@ -1,18 +1,20 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode, type RefObject } from "react";
 import { Button } from "./button";
 
-export function Dialog({ title, children, onDismiss, busy = false }: {
+export function Dialog({ title, children, onDismiss, busy = false, dialogRef }: {
   title: string;
   children: ReactNode;
   onDismiss: () => void;
   busy?: boolean;
+  dialogRef?: RefObject<HTMLDialogElement | null>;
 }) {
   const heading = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
+  const internalRef = useRef<HTMLDialogElement>(null);
+  const dialog = dialogRef ?? internalRef;
 
   useEffect(() => {
     const modal = dialog.current;
@@ -21,7 +23,7 @@ export function Dialog({ title, children, onDismiss, busy = false }: {
     if (!modal.open) modal.showModal();
     const focusTarget = modal.querySelector<HTMLElement>("[data-initial-focus]") ?? headingRef.current;
     focusTarget?.focus();
-  }, [title]);
+  }, [dialog, title]);
 
   return (
     <dialog

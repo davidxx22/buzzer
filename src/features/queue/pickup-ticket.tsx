@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { formatTicketNumber, isOrderId, isPickupOrder, statusLabels, ticketStatuses, type PickupOrder, type TicketStatus } from "./model";
 import { QueueError } from "./queue-feedback";
 import { readTicketSnapshot } from "./ticket-link";
-import { readTicketStatus } from "./ticket-status";
+import { readTicketStatus, reportPickupTicketOpened } from "./ticket-status";
 import { useQueue } from "./use-queue";
 
 function TicketShell({ children, tone, expanded }: { children: ReactNode; tone?: TicketStatus; expanded?: boolean }) {
@@ -44,10 +44,24 @@ export function PickupTicket() {
   if (!isOrderId(id)) return <TicketUnavailable />;
 
   const liveId = params.get("live");
-  return <OrderTicket key={id} id={id} snapshot={params.get("preview")} liveId={isOrderId(liveId) ? liveId : null} />;
+  const scanId = params.get("scan");
+  return (
+    <OrderTicket
+      key={id}
+      id={id}
+      snapshot={params.get("preview")}
+      liveId={isOrderId(liveId) ? liveId : undefined}
+      scanId={isOrderId(scanId) ? scanId : undefined}
+    />
+  );
 }
 
-function OrderTicket({ id, snapshot, liveId }: { id: string; snapshot: string | null; liveId: string | null }) {
+function OrderTicket({ id, snapshot, liveId, scanId }: {
+  id: string;
+  snapshot: string | null;
+  liveId?: string;
+  scanId?: string;
+}) {
   const { state, refresh } = useQueue(id);
 
   if (state.kind === "loading") return <TicketLoading />;
@@ -56,19 +70,22 @@ function OrderTicket({ id, snapshot, liveId }: { id: string; snapshot: string | 
   }
 
   const saved = state.tickets.find(isPickupOrder);
-  if (saved) return <TicketDetails order={saved} connection="live" />;
+  if (saved) {
+    const canReport = state.source === "shared" || Boolean(liveId);
+    return <TicketDetails order={saved} connection="live" liveId={liveId} scanId={canReport ? scanId : undefined} />;
+  }
 
   const order = state.source === "browser" ? readTicketSnapshot(id, snapshot) : null;
   if (!order) return <TicketUnavailable />;
 
   return liveId
-    ? <HostedTicket key={liveId} order={order} liveId={liveId} />
+    ? <HostedTicket key={liveId} order={order} liveId={liveId} scanId={scanId} />
     : <TicketDetails order={order} connection="snapshot" />;
 }
 
 type TicketConnection = "live" | "snapshot" | "connecting" | "unavailable";
 
-function HostedTicket({ order, liveId }: { order: PickupOrder; liveId: string }) {
+function HostedTicket({ order, liveId, scanId }: { order: PickupOrder; liveId: string; scanId?: string }) {
   const [result, setResult] = useState<{ status: TicketStatus; connection: TicketConnection }>({
     status: order.status,
     connection: "connecting",
@@ -106,13 +123,49 @@ function HostedTicket({ order, liveId }: { order: PickupOrder; liveId: string })
     };
   }, [liveId, order.id]);
 
-  return <TicketDetails order={{ ...order, status: result.status }} connection={result.connection} />;
+  return <TicketDetails order={{ ...order, status: result.status }} connection={result.connection} liveId={liveId} scanId={scanId} />;
 }
 
-function TicketDetails({ order, connection }: {
+function TicketDetails({ order, connection, liveId, scanId }: {
   order: PickupOrder;
   connection: TicketConnection;
+  liveId?: string;
+  scanId?: string;
 }) {
+  useEffect(() => {
+    if (!scanId || connection !== "live") return;
+    const confirmationId = scanId;
+
+    let active = true;
+    let reporting = false;
+    let reported = false;
+    let attempts = 0;
+    let retry: number;
+
+    async function report() {
+      if (!active || reporting || reported || document.visibilityState !== "visible" || attempts >= 3) return;
+
+      reporting = true;
+      attempts += 1;
+      try {
+        await reportPickupTicketOpened(order.id, confirmationId, liveId);
+        reported = true;
+      } catch {
+        if (active && attempts < 3) retry = window.setTimeout(report, 1500);
+      } finally {
+        reporting = false;
+      }
+    }
+
+    void report();
+    document.addEventListener("visibilitychange", report);
+    return () => {
+      active = false;
+      window.clearTimeout(retry);
+      document.removeEventListener("visibilitychange", report);
+    };
+  }, [connection, liveId, order.id, scanId]);
+
   const ready = order.status === "ready";
   const statusLabel = ready ? "Ready for pickup" : statusLabels[order.status];
   const showAlert = ready && connection === "live";

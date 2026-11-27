@@ -1,6 +1,7 @@
 // @ts-check
 
 export const ticketStatuses = /** @type {const} */ (["waiting", "ready", "collected"]);
+export const qrConfirmationTtl = 5 * 60;
 
 /**
  * @param {unknown} value
