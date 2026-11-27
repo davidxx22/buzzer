@@ -37,6 +37,7 @@
 - [x] Verify elapsed waiting time updates every second and a new timer starts when staff mark the order ready.
 - [x] Verify the Ready for pickup and Waiting orders headings appear without horizontal lines.
 - [x] Verify active staff tickets show timers and notes, with item summaries available in the QR dialog, customer ticket, and collected orders.
+- [x] Verify Notify marks an order ready and shows the pickup alert, and Collected moves it to Collected orders.
 
 ## Later phases
 

@@ -148,7 +148,7 @@ export function StaffQueue() {
                       {orders.map((ticket) => {
                         const number = formatTicketNumber(ticket).replace(/^#/, "");
                         const label = `No. ${number}`;
-                        const action = ticket.status === "waiting" ? "Mark ready" : "Mark collected";
+                        const action = ticket.status === "waiting" ? "Notify" : "Collected";
                         return (
                           <li key={ticket.id} className="staff-ticket grid overflow-hidden rounded-r-lg border border-l-0 border-border bg-card md:items-center">
                             <div className="ticket-paper staff-ticket-number row-span-2 grid content-center gap-px self-stretch px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
