@@ -158,7 +158,7 @@ export function StaffQueue() {
                             <div className="flex min-w-0 justify-between gap-2 px-3 pt-3 md:gap-4 md:px-4 md:pb-3">
                               <div className="min-w-0 self-center">
                                 {ticket.status === "collected" && <Badge variant="collected">{statusLabels.collected}</Badge>}
-                                {ticket.items && <p className="text-sm leading-5 text-foreground not-first:mt-2 [overflow-wrap:anywhere]">{orderSummary(ticket.items)}</p>}
+                                {ticket.status === "collected" && ticket.items && <p className="text-sm leading-5 text-foreground mt-2 [overflow-wrap:anywhere]">{orderSummary(ticket.items)}</p>}
                                 {ticket.notes && <p className="text-sm leading-5 whitespace-pre-wrap text-muted-foreground not-first:mt-1 [overflow-wrap:anywhere]">{ticket.notes}</p>}
                               </div>
                               <TicketTimer ticket={ticket} now={now} />

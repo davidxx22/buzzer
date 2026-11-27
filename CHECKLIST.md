@@ -34,7 +34,7 @@
 - [x] Verify staff timers persist after refresh in both demo modes and disappear on collection.
 - [x] Verify elapsed waiting time updates every second and a new timer starts when staff mark the order ready.
 - [x] Verify the Ready for pickup and Waiting orders headings appear without horizontal lines.
-- [x] Verify active staff tickets show items and timers without Ready or Waiting badges.
+- [x] Verify active staff tickets show timers and notes, with item summaries available in the QR dialog, customer ticket, and collected orders.
 
 ## Later phases
 
