@@ -4,7 +4,7 @@ import { BellRing, Ticket } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { formatTicketNumber, isOrderId, isPickupOrder, statusLabels, ticketStatuses, type PickupOrder, type TicketStatus } from "./model";
+import { formatTicketNumber, isOrderId, isPickupOrder, statusLabels, ticketStatuses, type OrderItem, type PickupOrder, type TicketStatus } from "./model";
 import { QueueError } from "./queue-feedback";
 import { readTicketSnapshot } from "./ticket-link";
 import { readTicketStatus, reportPickupTicketOpened } from "./ticket-status";
@@ -86,7 +86,7 @@ function OrderTicket({ id, snapshot, liveId, scanId }: {
 type TicketConnection = "live" | "snapshot" | "connecting" | "unavailable";
 
 function HostedTicket({ order, liveId, scanId }: { order: PickupOrder; liveId: string; scanId?: string }) {
-  const [result, setResult] = useState<{ status: TicketStatus; connection: TicketConnection }>({
+  const [result, setResult] = useState<{ status: TicketStatus; connection: TicketConnection; orderItems?: { revision: number; items: OrderItem[] } }>({
     status: order.status,
     connection: "connecting",
   });
@@ -99,11 +99,12 @@ function HostedTicket({ order, liveId, scanId }: { order: PickupOrder; liveId: s
       if (!active || document.hidden || inFlight || collected) return;
       inFlight = true;
       try {
-        const status = await readTicketStatus(order.id, liveId);
+        const { status, orderItems } = await readTicketStatus(order.id, liveId);
         if (!active) return;
         collected = status === "collected";
         setResult((previous) => ({
           status: ticketStatuses.indexOf(status) >= ticketStatuses.indexOf(previous.status) ? status : previous.status,
+          orderItems: orderItems && orderItems.revision >= (previous.orderItems?.revision ?? -1) ? orderItems : previous.orderItems,
           connection: "live",
         }));
       } catch {
@@ -123,7 +124,7 @@ function HostedTicket({ order, liveId, scanId }: { order: PickupOrder; liveId: s
     };
   }, [liveId, order.id]);
 
-  return <TicketDetails order={{ ...order, status: result.status }} connection={result.connection} liveId={liveId} scanId={scanId} />;
+  return <TicketDetails order={{ ...order, items: result.orderItems?.items ?? order.items, status: result.status }} connection={result.connection} liveId={liveId} scanId={scanId} />;
 }
 
 function TicketDetails({ order, connection, liveId, scanId }: {

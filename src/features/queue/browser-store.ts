@@ -1,4 +1,4 @@
-import { isPickupOrder, isQueueTicket, newPickupOrder, transitionTicket, type OrderDetails, type QueueTicket, type TicketStatus } from "./model";
+import { isPickupOrder, isQueueTicket, newPickupOrder, reviseWaitingOrder, transitionTicket, type OrderDetails, type QueueTicket, type TicketStatus } from "./model";
 import { publishTicketStatus } from "./ticket-status";
 
 const STORAGE_KEY = "buzzer:demo-queue:v1";
@@ -59,9 +59,23 @@ export function shareBrowserOrder(id: string, scanId: string) {
 
     const savedSecret = localStorage.getItem(sharingKey(id));
     const secret = savedSecret ?? Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("");
-    const liveId = await publishTicketStatus(id, secret, order.status, !savedSecret, scanId);
+    const liveId = await publishTicketStatus(id, secret, order.status, { allowPreview: !savedSecret, scanId, order });
     if (liveId && !savedSecret) localStorage.setItem(sharingKey(id), secret);
     return { order, liveId };
+  });
+}
+
+export function updateBrowserOrder(id: string, revision: number, details: OrderDetails) {
+  return changeQueue(async () => {
+    const tickets = readQueue();
+    const ticket = tickets.find((entry) => entry.id === id);
+    const updated = ticket ? reviseWaitingOrder(ticket, revision, details) : null;
+    if (!updated) return null;
+
+    const secret = localStorage.getItem(sharingKey(id));
+    if (secret) await publishTicketStatus(id, secret, updated.status, { order: updated });
+    saveQueue(tickets.map((entry) => entry.id === id ? updated : entry));
+    return updated;
   });
 }
 
@@ -73,7 +87,7 @@ export function updateTicketStatus(id: string, status: TicketStatus) {
     if (!updated) return false;
 
     const secret = localStorage.getItem(sharingKey(id));
-    if (secret) await publishTicketStatus(id, secret, status);
+    if (secret) await publishTicketStatus(id, secret, status, { order: isPickupOrder(updated) ? updated : undefined });
     saveQueue(tickets.map((entry) => (entry.id === id ? updated : entry)));
     return true;
   });

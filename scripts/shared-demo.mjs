@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { networkInterfaces } from "node:os";
 import { extname, isAbsolute, join, relative, resolve } from "node:path";
-import { isOrderDetails, isOrderId, isPickupOrder, isQueueTicket, newPickupOrder, ordersEndpoint, ticketStatusEndpoint, transitionTicket } from "../src/features/queue/model.ts";
+import { isOrderDetails, isOrderId, isPickupOrder, isQueueTicket, newPickupOrder, ordersEndpoint, reviseWaitingOrder, ticketStatusEndpoint, transitionTicket } from "../src/features/queue/model.ts";
 import { qrConfirmationTtl } from "../src/features/queue/ticket-rules.mjs";
 
 const staticDirectory = resolve("out");
@@ -105,6 +105,19 @@ async function orderApi(request, response, url) {
       if (existing) return { result: existing };
       const result = newPickupOrder(tickets, id, details);
       return { result, nextQueue: [...tickets, result] };
+    });
+    return json(response, 200, order);
+  }
+
+  if (body.details !== undefined) {
+    if (!isOrderDetails(body.details) || !Number.isSafeInteger(body.revision) || body.revision < 0) {
+      return json(response, 400, { error: "Invalid order edit." });
+    }
+    const order = await changeQueue((tickets) => {
+      const ticket = tickets.find((entry) => entry.id === id);
+      const updated = ticket ? reviseWaitingOrder(ticket, body.revision, body.details) : null;
+      if (!updated) return { result: null };
+      return { result: updated, nextQueue: tickets.map((entry) => entry.id === id ? updated : entry) };
     });
     return json(response, 200, order);
   }

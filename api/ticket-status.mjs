@@ -1,7 +1,7 @@
 // @ts-check
 import { createHash } from "node:crypto";
 import { getCache } from "@vercel/functions";
-import { isOrderId, isTicketStatus, qrConfirmationTtl, ticketStatuses } from "../src/features/queue/ticket-rules.mjs";
+import { isOrderId, isTicketStatus, isVersionedOrderItems, qrConfirmationTtl, ticketStatuses } from "../src/features/queue/ticket-rules.mjs";
 
 const ttl = 12 * 60 * 60;
 const headers = { "Cache-Control": "no-store" };
@@ -28,9 +28,13 @@ export default {
         }
 
         // Separate marks keep a delayed Waiting or Ready write from undoing Collected.
-        const marks = await Promise.all(ticketStatuses.map((status) => cache.get(`${orderId}:${id}:${status}`)));
+        const key = `${orderId}:${id}`;
+        const [marks, orderItems] = await Promise.all([
+          Promise.all(ticketStatuses.map((status) => cache.get(`${key}:${status}`))),
+          cache.get(`${key}:items`),
+        ]);
         const status = ticketStatuses[marks.lastIndexOf(true)];
-        return status ? Response.json({ status }, { headers }) : new Response(null, { status: 404, headers });
+        return status ? Response.json({ status, orderItems: orderItems ?? undefined }, { headers }) : new Response(null, { status: 404, headers });
       }
 
       if (request.method === "POST") {
@@ -55,10 +59,21 @@ export default {
         if (!isOrderId(orderId) || !isTicketStatus(status) || (scanId !== undefined && !isOrderId(scanId))) {
           return new Response(null, { status: 400, headers });
         }
+        const orderItems = body?.orderItems;
+        if (orderItems !== undefined && !isVersionedOrderItems(orderItems)) {
+          return new Response(null, { status: 400, headers });
+        }
 
         const id = createHash("sha256").update(`${secret}:${orderId}`).digest("hex").slice(0, 32);
-        await cache.set(`${orderId}:${id}:${status}`, true, { ttl });
-        if (scanId) await cache.set(`${orderId}:${id}:qr:${scanId}:pending`, true, { ttl: qrConfirmationTtl });
+        const key = `${orderId}:${id}`;
+        if (orderItems) {
+          const previous = await cache.get(`${key}:items`);
+          if (!isVersionedOrderItems(previous) || orderItems.revision >= previous.revision) {
+            await cache.set(`${key}:items`, { revision: orderItems.revision, items: orderItems.items }, { ttl });
+          }
+        }
+        await cache.set(`${key}:${status}`, true, { ttl });
+        if (scanId) await cache.set(`${key}:qr:${scanId}:pending`, true, { ttl: qrConfirmationTtl });
         return Response.json({ id }, { headers });
       }
 

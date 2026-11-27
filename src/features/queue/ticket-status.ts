@@ -1,6 +1,7 @@
-import { isOrderId, isTicketStatus, ticketStatusEndpoint, type TicketStatus } from "./model";
+import { isOrderId, isTicketStatus, ticketStatusEndpoint, type PickupOrder, type TicketStatus } from "./model";
+import { isVersionedOrderItems } from "./ticket-rules.mjs";
 
-function postTicketRequest(body: Record<string, string | undefined>, secret?: string) {
+function postTicketRequest(body: Record<string, unknown>, secret?: string) {
   const headers = new Headers({ "Content-Type": "application/json" });
   if (secret) headers.set("Authorization", `Bearer ${secret}`);
   return fetch(ticketStatusEndpoint, {
@@ -12,20 +13,26 @@ function postTicketRequest(body: Record<string, string | undefined>, secret?: st
   });
 }
 
-export async function readTicketStatus(orderId: string, id: string): Promise<TicketStatus> {
+export async function readTicketStatus(orderId: string, id: string) {
   const response = await fetch(`${ticketStatusEndpoint}?order=${orderId}&id=${id}`, {
     cache: "no-store",
     signal: AbortSignal.timeout(8000),
   });
   if (!response.ok) throw new Error("The live ticket status is unavailable.");
 
-  const { status } = await response.json();
+  const { status, orderItems } = await response.json();
   if (!isTicketStatus(status)) throw new Error("The live ticket status is invalid.");
-  return status;
+  return { status, orderItems: isVersionedOrderItems(orderItems) ? orderItems : undefined };
 }
 
-export async function publishTicketStatus(orderId: string, secret: string, status: TicketStatus, allowPreview = false, scanId?: string) {
-  const response = await postTicketRequest({ orderId, status, scanId }, secret);
+export async function publishTicketStatus(orderId: string, secret: string, status: TicketStatus, options: {
+  allowPreview?: boolean;
+  scanId?: string;
+  order?: PickupOrder;
+} = {}) {
+  const { allowPreview, scanId, order } = options;
+  const orderItems = order ? { revision: order.revision ?? 0, items: order.items } : undefined;
+  const response = await postTicketRequest({ orderId, status, scanId, orderItems }, secret);
   if (response.status === 404 && allowPreview) return null;
   if (!response.ok) throw new Error("The live ticket status couldn’t be saved.");
 

@@ -1,6 +1,6 @@
-import { isOrderId, isTicketStatus, ticketStatuses } from "./ticket-rules.mjs";
+import { isOrderId, isOrderItems, isTicketStatus, orderLimits, ticketStatuses } from "./ticket-rules.mjs";
 
-export { isOrderId, isTicketStatus, ticketStatuses };
+export { isOrderId, isOrderItems, isTicketStatus, orderLimits, ticketStatuses };
 export type TicketStatus = (typeof ticketStatuses)[number];
 
 export type OrderItem = { name: string; quantity: number };
@@ -11,6 +11,7 @@ export interface QueueTicket {
   number: number;
   status: TicketStatus;
   statusStartedAt?: number;
+  revision?: number;
   items?: OrderItem[];
   notes?: string;
 }
@@ -18,7 +19,6 @@ export interface QueueTicket {
 export type PickupOrder = QueueTicket & OrderDetails;
 export type OrderSource = "browser" | "shared";
 
-export const orderLimits = { items: 8, name: 60, quantity: 99, notes: 240 };
 export const ordersEndpoint = "/api/orders/";
 export const ticketStatusEndpoint = "/api/ticket-status";
 
@@ -40,21 +40,19 @@ export function isOrderDetails(value: unknown): value is OrderDetails {
   if (!value || typeof value !== "object") return false;
 
   const { items, notes } = value as Partial<OrderDetails>;
-  return Array.isArray(items) && items.length > 0 && items.length <= orderLimits.items &&
-    items.every((item) => item && typeof item.name === "string" && item.name.trim().length > 0 &&
-      item.name.length <= orderLimits.name && !/[\x00-\x1f\x7f]/.test(item.name) &&
-      Number.isSafeInteger(item.quantity) && item.quantity >= 1 && item.quantity <= orderLimits.quantity) &&
+  return isOrderItems(items) &&
     typeof notes === "string" && notes.length <= orderLimits.notes;
 }
 
 export function isQueueTicket(value: unknown): value is QueueTicket {
   if (!value || typeof value !== "object") return false;
 
-  const { id, number, status, statusStartedAt, items, notes } = value as Partial<QueueTicket>;
+  const { id, number, status, statusStartedAt, revision, items, notes } = value as Partial<QueueTicket>;
   return typeof id === "string" && id.length > 0 &&
     typeof number === "number" && Number.isSafeInteger(number) && number > 0 &&
     isTicketStatus(status) &&
     (statusStartedAt === undefined || Number.isSafeInteger(statusStartedAt) && statusStartedAt >= 0) &&
+    (revision === undefined || Number.isSafeInteger(revision) && revision >= 0) &&
     (items === undefined && notes === undefined || isOrderId(id) && isOrderDetails(value));
 }
 
@@ -76,4 +74,15 @@ export function nextStatus(status: TicketStatus) {
 export function transitionTicket(ticket: QueueTicket, status: TicketStatus): QueueTicket | null {
   if (nextStatus(ticket.status) !== status) return null;
   return { ...ticket, status, statusStartedAt: Date.now() };
+}
+
+export function reviseWaitingOrder(ticket: QueueTicket, revision: number, details: OrderDetails): PickupOrder | null {
+  if (ticket.status !== "waiting" || !isPickupOrder(ticket) || (ticket.revision ?? 0) !== revision || !isOrderDetails(details)) return null;
+
+  return {
+    ...ticket,
+    items: details.items.map(({ name, quantity }) => ({ name: name.trim(), quantity })),
+    notes: details.notes.trim(),
+    revision: revision + 1,
+  };
 }

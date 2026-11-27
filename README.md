@@ -24,7 +24,9 @@ Open [Buzzer Staff](https://buzzerrr.vercel.app/staff/), create an order, scan i
 
 The staff **Open ticket** button previews the ticket and leaves the dialog open. Each new QR display checks for a ticket opening for five minutes. The pickup link remains usable after that check ends.
 
-The cashier’s browser keeps the order. Vercel’s temporary cache shares its status with the phone, so this demo needs no database. Reopen **Show QR** to publish the current status if a live link has expired or the original QR was created before live updates were added.
+The cashier’s browser keeps the order. Vercel’s temporary cache shares its status and items with the phone, so this demo needs no database. Reopen the QR from the ticket’s QR icon to publish the current order if a live link has expired.
+
+Select the ticket number to see the items, quantities, and notes. While an order is waiting, **Edit order** lets staff add items, change quantities, or update notes. Saving keeps the same order number and waiting timer. Open live pickup tickets show the updated items. Once staff select **Notify**, the order is read-only.
 
 Staff tickets show elapsed minutes and seconds while waiting. **Notify** starts a new timer for the time since the order became ready. Timers survive a refresh in both demo modes. Orders saved before timers were added get a timer the next time staff mark them ready.
 
@@ -40,7 +42,7 @@ npm run demo:shared
 Use a private Wi-Fi network and fictional orders. Connect both devices to that network. Open the printed Wi-Fi address on the cashier device so the QR contains an address the phone can reach.
 
 1. In **Staff**, select **New order**. Create **#01** with one **Matcha coffee**, then **#02** with one **Iced latte**. Use **Add item** when an order includes more than one item.
-2. Reopen **Show QR** for **#01**, scan it with the phone camera, and open the link. Check that the staff dialog shows the confirmation in place of the QR and then closes. The phone should show **#01**, **1 × Matcha coffee**, and **Waiting**. Keep the ticket open for the pickup alert.
+2. Select the QR icon for **#01**, scan it with the phone camera, and open the link. Check that the staff dialog shows the confirmation in place of the QR and then closes. The phone should show **#01**, **1 × Matcha coffee**, and **Waiting**. Keep the ticket open for the pickup alert.
 3. Select **Notify** for **#02** first. The matcha ticket stays **Waiting**.
 4. Select **Notify** for **#01**. The phone shows **Ready for pickup** and a **Simulated pickup alert**. Select **Collected** and confirm it moves to **Collected orders**.
 

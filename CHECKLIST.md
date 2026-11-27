@@ -38,7 +38,9 @@
 - [x] Verify the Ready for pickup and Waiting orders headings appear without horizontal lines.
 - [x] Verify active staff tickets show timers and notes, with item summaries available in the QR dialog, customer ticket, and collected orders.
 - [x] Verify Notify marks an order ready and shows the pickup alert, and Collected moves it to Collected orders.
-- [x] Verify Show QR, Notify, and Collected have matching dimensions in the staff queue and Show QR opens the pickup dialog.
+- [x] Verify the QR icon opens the pickup dialog and Notify and Collected have matching dimensions.
+- [x] Verify ticket numbers open Order details and only waiting orders can be edited.
+- [x] Verify edits preserve the order number and timer, reject stale saves, and show updated items on the original live pickup link in the shared demo and a local hosted-mode test.
 
 ## Later phases
 

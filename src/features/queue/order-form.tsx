@@ -3,21 +3,25 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { isOrderDetails, orderLimits, type OrderDetails } from "./model";
+import { isOrderDetails, orderLimits, type OrderDetails, type PickupOrder } from "./model";
 
 type ItemField = { key: number; name: string; quantity: string };
 const fieldClass = "min-h-11 w-full min-w-0 rounded-lg border border-border bg-card px-3 text-base placeholder:text-muted-foreground";
 
-export function OrderForm({ busy, error, onCreate }: {
+export function OrderForm({ busy, error, order, onSave, onCancel }: {
   busy: boolean;
   error: string;
-  onCreate: (id: string, details: OrderDetails) => void;
+  order?: PickupOrder;
+  onSave: (id: string, details: OrderDetails) => void;
+  onCancel?: () => void;
 }) {
-  const [items, setItems] = useState<ItemField[]>([{ key: 0, name: "", quantity: "1" }]);
-  const [notes, setNotes] = useState("");
+  const [items, setItems] = useState<ItemField[]>(() => order
+    ? order.items.map(({ name, quantity }, key) => ({ key, name, quantity: String(quantity) }))
+    : [{ key: 0, name: "", quantity: "1" }]);
+  const [notes, setNotes] = useState(order?.notes ?? "");
   const [validationError, setValidationError] = useState("");
-  const nextKey = useRef(1);
-  const orderId = useRef<string>(null);
+  const nextKey = useRef(items.length);
+  const orderId = useRef<string | null>(order?.id ?? null);
 
   function editItem(key: number, value: Partial<Pick<ItemField, "name" | "quantity">>) {
     setItems((oldItems) => oldItems.map((item) => item.key === key ? { ...item, ...value } : item));
@@ -36,7 +40,7 @@ export function OrderForm({ busy, error, onCreate }: {
     }
     setValidationError("");
     orderId.current ??= Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, "0")).join("");
-    onCreate(orderId.current, details);
+    onSave(orderId.current, details);
   }
 
   return (
@@ -78,8 +82,11 @@ export function OrderForm({ busy, error, onCreate }: {
         <textarea className={`${fieldClass} resize-y py-2.5`} rows={2} maxLength={orderLimits.notes} value={notes} disabled={busy} onChange={(event) => setNotes(event.target.value)} />
       </label>
       {(validationError || error) && <p role="alert" className="rounded-lg bg-danger-surface p-3 text-sm text-danger">{validationError || error}</p>}
-      <div className="flex justify-end">
-        <Button type="submit" disabled={busy}>{busy ? "Creating…" : "Create order"}</Button>
+      <div className="flex justify-end gap-2">
+        {onCancel && <Button type="button" variant="outline" disabled={busy} onClick={onCancel}>Cancel</Button>}
+        <Button type="submit" disabled={busy}>
+          {busy ? (order ? "Saving…" : "Creating…") : order ? "Save changes" : "Create order"}
+        </Button>
       </div>
     </form>
   );

@@ -1,4 +1,4 @@
-import { createBrowserOrder, readQueue, updateTicketStatus } from "./browser-store";
+import { createBrowserOrder, readQueue, updateBrowserOrder, updateTicketStatus } from "./browser-store";
 import { ordersEndpoint, type OrderDetails, type OrderSource, type PickupOrder, type QueueTicket, type TicketStatus } from "./model";
 
 let sourceRequest: Promise<OrderSource> | undefined;
@@ -49,5 +49,14 @@ export async function advanceOrder(id: string, status: TicketStatus) {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id, status }),
+  });
+}
+
+export async function editOrder(id: string, revision: number, details: OrderDetails) {
+  if (await getOrderSource() === "browser") return updateBrowserOrder(id, revision, details);
+  return requestOrders<PickupOrder | null>(ordersEndpoint, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, revision, details }),
   });
 }

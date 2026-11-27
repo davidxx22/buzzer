@@ -1,22 +1,27 @@
 "use client";
 
-import { ClipboardList, Plus } from "lucide-react";
+import { ChevronRight, ClipboardList, Plus, QrCode } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
-import { formatTicketNumber, isPickupOrder, nextStatus, orderSummary, statusLabels, type OrderDetails, type OrderSource, type PickupOrder, type QueueTicket } from "./model";
+import { formatTicketNumber, isPickupOrder, nextStatus, orderSummary, statusLabels, type OrderDetails as OrderDetailsData, type OrderSource, type PickupOrder, type QueueTicket } from "./model";
+import { OrderDetails } from "./order-details";
 import { OrderForm } from "./order-form";
 import { OrderQr } from "./order-qr";
-import { advanceOrder, createOrder } from "./order-store";
+import { advanceOrder, createOrder, editOrder } from "./order-store";
 import { QueueCounts } from "./queue-counts";
 import { QueueError } from "./queue-feedback";
 import { TicketTimer } from "./ticket-timer";
 import { useQueue } from "./use-queue";
 
 type QueueView = "active" | "collected";
-type QueueDialog = { kind: "create" } | { kind: "qr"; order: PickupOrder; source: OrderSource };
+type QueueDialog =
+  | { kind: "create" }
+  | { kind: "qr"; order: PickupOrder; source: OrderSource }
+  | { kind: "details"; ticket: QueueTicket }
+  | { kind: "edit"; order: PickupOrder };
 
 export function StaffQueue() {
   const { state, refresh } = useQueue();
@@ -25,8 +30,8 @@ export function StaffQueue() {
   const [announcement, setAnnouncement] = useState("");
   const [error, setError] = useState("");
   const [dialog, setDialog] = useState<QueueDialog | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [createError, setCreateError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [formError, setFormError] = useState("");
   const [now, setNow] = useState<number | null>(null);
   const activeFilter = useRef<HTMLButtonElement>(null);
   const orderDialog = useRef<HTMLDialogElement>(null);
@@ -63,24 +68,38 @@ export function StaffQueue() {
     }
   }
 
-  async function submitOrder(id: string, details: OrderDetails) {
-    if (isCreating || state.kind !== "loaded") return;
-    setIsCreating(true);
-    setCreateError("");
+  async function submitOrder(id: string, details: OrderDetailsData) {
+    if (isSaving || state.kind !== "loaded") return;
+    setIsSaving(true);
+    setFormError("");
     try {
+      if (dialog?.kind === "edit") {
+        const updated = await editOrder(id, dialog.order.revision ?? 0, details);
+        await refresh();
+        if (updated) {
+          setAnnouncement(`Order ${formatTicketNumber(updated)} updated.`);
+          setDialog({ kind: "details", ticket: updated });
+        } else {
+          setFormError("This order changed while you were editing. Review the latest details before trying again.");
+          setDialog({ kind: "details", ticket: dialog.order });
+        }
+        return;
+      }
+
       const order = await createOrder(id, details);
       setView("active");
       setAnnouncement(`Order ${formatTicketNumber(order)} created.`);
       setDialog({ kind: "qr", order, source: state.source });
       await refresh();
     } catch {
-      setCreateError("The order couldn’t be saved. Check your connection or browser storage and try again.");
+      setFormError("The order couldn’t be saved. Check your connection or browser storage and try again.");
     } finally {
-      setIsCreating(false);
+      setIsSaving(false);
     }
   }
 
   const tickets = state.kind === "loaded" ? state.tickets : [];
+  const selectedTicket = dialog?.kind === "details" ? tickets.find(({ id }) => id === dialog.ticket.id) : undefined;
   const hasActiveTimers = view === "active" && tickets.some((ticket) => ticket.status !== "collected" && ticket.statusStartedAt !== undefined);
 
   useEffect(() => {
@@ -109,7 +128,7 @@ export function StaffQueue() {
           <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Mark orders ready for pickup, then close each ticket when it’s collected.</p>
         </div>
         <Button type="button" disabled={state.kind !== "loaded"} onClick={() => {
-          setCreateError("");
+          setFormError("");
           setDialog({ kind: "create" });
         }}>
           <Plus size={18} strokeWidth={1.75} aria-hidden="true" />
@@ -151,10 +170,21 @@ export function StaffQueue() {
                         const action = ticket.status === "waiting" ? "Notify" : "Collected";
                         return (
                           <li key={ticket.id} className="staff-ticket grid overflow-hidden rounded-r-lg border border-l-0 border-border bg-card md:items-center">
-                            <div className="ticket-paper staff-ticket-number row-span-2 grid content-center gap-px self-stretch px-2 py-3 text-center md:row-span-1" data-tone={ticket.status}>
-                              <span className="text-xs leading-none font-semibold">No.</span>
+                            <button
+                              type="button"
+                              className="ticket-paper staff-ticket-number row-span-2 grid cursor-pointer content-center gap-px self-stretch px-2 py-3 text-center hover:brightness-95 focus-visible:-outline-offset-8 focus-visible:outline-current md:row-span-1"
+                              data-tone={ticket.status}
+                              aria-label={`Order details for ${label}`}
+                              onClick={() => {
+                                setFormError("");
+                                setDialog({ kind: "details", ticket });
+                              }}
+                            >
+                              <span className="flex items-center justify-center gap-0.5 text-xs leading-none font-semibold">
+                                No.<ChevronRight size={12} aria-hidden="true" />
+                              </span>
                               <span className="font-display text-[2.125rem] leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-[2.5rem]">{number}</span>
-                            </div>
+                            </button>
                             <div className="flex min-w-0 justify-between gap-2 px-3 pt-3 md:gap-4 md:px-4 md:pb-3">
                               <div className="min-w-0 self-center">
                                 {ticket.status === "collected" && <Badge variant="collected">{statusLabels.collected}</Badge>}
@@ -167,11 +197,12 @@ export function StaffQueue() {
                               {isPickupOrder(ticket) && (
                                 <Button
                                   variant="outline"
-                                  className="w-24"
+                                  className="size-11 shrink-0 px-0"
                                   aria-label={`Show QR for ${label}`}
+                                  title="Show pickup QR"
                                   onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}
                                 >
-                                  Show QR
+                                  <QrCode size={18} aria-hidden="true" />
                                 </Button>
                               )}
                               {ticket.status !== "collected" && (
@@ -205,14 +236,39 @@ export function StaffQueue() {
         </>
       )}
       {dialog && (
-        <Dialog title={dialog.kind === "create" ? "New order" : "Pickup QR"} busy={isCreating} onDismiss={() => setDialog(null)} dialogRef={orderDialog}>
-          {dialog.kind === "create" ? (
-            <OrderForm busy={isCreating} error={createError} onCreate={(id, details) => void submitOrder(id, details)} />
-          ) : (
-            <OrderQr order={dialog.order} source={dialog.source} onClose={closeOrderDialog} />
+        <Dialog title={dialogTitles[dialog.kind]} busy={isSaving} onDismiss={() => setDialog(null)} dialogRef={orderDialog}>
+          {(dialog.kind === "create" || dialog.kind === "edit") && (
+            <OrderForm
+              order={dialog.kind === "edit" ? dialog.order : undefined}
+              busy={isSaving}
+              error={formError}
+              onSave={(id, details) => void submitOrder(id, details)}
+              onCancel={dialog.kind === "edit" ? () => {
+                setFormError("");
+                setDialog({ kind: "details", ticket: dialog.order });
+              } : undefined}
+            />
+          )}
+          {dialog.kind === "qr" && <OrderQr order={dialog.order} source={dialog.source} onClose={closeOrderDialog} />}
+          {dialog.kind === "details" && (
+            <OrderDetails
+              ticket={selectedTicket ?? dialog.ticket}
+              error={formError}
+              onEdit={selectedTicket?.status === "waiting" && isPickupOrder(selectedTicket) ? () => {
+                setFormError("");
+                setDialog({ kind: "edit", order: selectedTicket });
+              } : undefined}
+            />
           )}
         </Dialog>
       )}
     </Card>
   );
 }
+
+const dialogTitles: Record<QueueDialog["kind"], string> = {
+  create: "New order",
+  qr: "Pickup QR",
+  details: "Order details",
+  edit: "Edit order",
+};
