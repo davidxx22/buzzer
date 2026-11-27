@@ -70,14 +70,10 @@
 }
 
 @layer components {
-  .ticket-paper,
-  .staff-ticket {
+  .ticket-paper {
     --ticket-edge-radius: 0.3125rem;
     --ticket-edge-depth: 0.375rem;
     --ticket-edge-pitch: 0.75rem;
-  }
-
-  .ticket-paper {
     position: relative;
     background: var(--paper, var(--paper-cream));
     color: var(--paper-ink);
@@ -89,6 +85,9 @@
   }
 
   .staff-ticket {
+    --ticket-edge-radius: 0.21875rem;
+    --ticket-edge-depth: 0.25rem;
+    --ticket-edge-pitch: 0.5rem;
     --stub-width: 4.5rem;
     --seam-notch: 6px;
     --seam-outline: calc(var(--seam-notch) + 1px);

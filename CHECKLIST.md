@@ -29,7 +29,7 @@
 - [x] Verify that opening the customer QR link replaces the QR with an in-dialog confirmation before closing. Staff previews and QR links from an earlier dialog leave the current dialog open.
 - [x] Verify the business logo appears in the navbar, the dropdown opens the staff queue, and Escape closes it and returns focus to the logo.
 - [x] Verify the white dashed perforation sits 2px inside the colored number stub for Waiting, Ready, and Collected orders.
-- [x] Verify staff tickets use the customer ticket’s scallop size along the left edge and retain the perforation notches and status colors.
+- [x] Verify staff tickets use smaller scallops along the left edge and that customer tickets keep their existing scallop size.
 - [x] Verify the ticket cutouts have a smooth, crisp outline and the white dashes stop short of the notches.
 - [x] Verify staff timers persist after refresh in both demo modes and disappear on collection.
 - [x] Verify elapsed waiting time updates every second and a new timer starts when staff mark the order ready.
