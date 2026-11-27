@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
-import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const pathname = usePathname().replace(/\/$/, "");
@@ -31,7 +30,7 @@ export function SiteHeader() {
   }, [closeBusinessMenu]);
 
   return (
-    <header className={cn("border-b border-border bg-card text-foreground", isStaffPage && "staff-theme")}>
+    <header className="staff-theme relative bg-card text-foreground shadow-[0_2px_8px_-2px_rgb(0_0_0/0.14)]">
       <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-8">
         <Link href="/" className="flex min-h-11 items-center gap-2.5 rounded-lg">
           <BellRing size={19} strokeWidth={1.75} className="text-primary" aria-hidden="true" />

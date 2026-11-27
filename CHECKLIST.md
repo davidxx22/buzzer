@@ -26,7 +26,8 @@
 - [x] Verify collected pickup tickets and staff number stubs both use #A8A29E with dark text.
 - [x] Verify staff ticket stubs show “No.” above the padded order number in every order state.
 - [x] Verify the homepage, staff page, and pickup ticket page use the #F5F5F4 backdrop.
-- [x] Verify the staff queue cards, navbar, and dialog use #FAFAF9. Verify primary buttons use #008000 with #FAFAF9 text.
+- [x] Verify the staff queue cards and dialog use #FAFAF9. Verify primary buttons use #008000 with #FAFAF9 text.
+- [x] Verify all three page navbars use #FAFAF9 with a bottom shadow and no border.
 - [x] Verify that opening the customer QR link replaces the QR with an in-dialog confirmation before closing. Staff previews and QR links from an earlier dialog leave the current dialog open.
 - [x] Verify the business logo appears in the navbar, the dropdown opens the staff queue, and Escape closes it and returns focus to the logo.
 - [x] Verify the off-white dashed perforation sits 2px inside the colored number stub.
