@@ -70,6 +70,13 @@
 }
 
 @layer components {
+  .ticket-paper,
+  .staff-ticket {
+    --ticket-edge-radius: 0.3125rem;
+    --ticket-edge-depth: 0.375rem;
+    --ticket-edge-pitch: 0.75rem;
+  }
+
   .ticket-paper {
     position: relative;
     background: var(--paper, var(--paper-cream));
@@ -83,31 +90,27 @@
 
   .staff-ticket {
     --stub-width: 4.5rem;
-    --stub-seam: calc(var(--stub-width) + 1px);
-    --side-notch: 8px;
     --seam-notch: 6px;
-    --side-outline: calc(var(--side-notch) + 1px);
     --seam-outline: calc(var(--seam-notch) + 1px);
     /* Blend only the half pixel around each curved edge. */
     --notch-antialias: 0.25px;
     position: relative;
     grid-template-columns: var(--stub-width) minmax(0, 1fr);
-    mask-image:
-      radial-gradient(circle at left center, transparent calc(var(--side-notch) - var(--notch-antialias)), black calc(var(--side-notch) + var(--notch-antialias))),
-      radial-gradient(circle at var(--stub-seam) top, transparent calc(var(--seam-notch) - var(--notch-antialias)), black calc(var(--seam-notch) + var(--notch-antialias))),
-      radial-gradient(circle at var(--stub-seam) bottom, transparent calc(var(--seam-notch) - var(--notch-antialias)), black calc(var(--seam-notch) + var(--notch-antialias)));
-    mask-composite: intersect;
+    mask:
+      radial-gradient(circle at var(--stub-width) top, transparent calc(var(--seam-notch) - var(--notch-antialias)), black calc(var(--seam-notch) + var(--notch-antialias))) intersect,
+      radial-gradient(circle at var(--stub-width) bottom, transparent calc(var(--seam-notch) - var(--notch-antialias)), black calc(var(--seam-notch) + var(--notch-antialias))) intersect,
+      linear-gradient(black, black) right / calc(100% - var(--ticket-edge-depth)) 100% no-repeat,
+      radial-gradient(circle at right center, black var(--ticket-edge-radius), transparent var(--ticket-edge-depth)) left center / var(--ticket-edge-depth) var(--ticket-edge-pitch) repeat-y;
   }
 
   .staff-ticket::before {
     position: absolute;
-    /* Align the arcs with the mask, which starts at the outer border edge. */
-    inset: -1px;
+    /* Align the arcs with the mask at the ticket's outer edges. */
+    inset: -1px -1px -1px 0;
     z-index: 1;
     background:
-      radial-gradient(circle at left center, var(--border) calc(var(--side-outline) - var(--notch-antialias)), transparent calc(var(--side-outline) + var(--notch-antialias))),
-      radial-gradient(circle at var(--stub-seam) top, var(--border) calc(var(--seam-outline) - var(--notch-antialias)), transparent calc(var(--seam-outline) + var(--notch-antialias))),
-      radial-gradient(circle at var(--stub-seam) bottom, var(--border) calc(var(--seam-outline) - var(--notch-antialias)), transparent calc(var(--seam-outline) + var(--notch-antialias)));
+      radial-gradient(circle at var(--stub-width) top, var(--border) calc(var(--seam-outline) - var(--notch-antialias)), transparent calc(var(--seam-outline) + var(--notch-antialias))),
+      radial-gradient(circle at var(--stub-width) bottom, var(--border) calc(var(--seam-outline) - var(--notch-antialias)), transparent calc(var(--seam-outline) + var(--notch-antialias)));
     content: "";
     pointer-events: none;
   }
@@ -139,9 +142,9 @@
   .ticket-edge::after {
     position: absolute;
     inset: 100% 0 auto;
-    height: 0.375rem;
-    background: radial-gradient(circle at center top, var(--paper, var(--paper-cream)) 0.3125rem, transparent 0.375rem)
-      center top / 0.75rem 0.375rem repeat-x;
+    height: var(--ticket-edge-depth);
+    background: radial-gradient(circle at center top, var(--paper, var(--paper-cream)) var(--ticket-edge-radius), transparent var(--ticket-edge-depth))
+      center top / var(--ticket-edge-pitch) var(--ticket-edge-depth) repeat-x;
     content: "";
     pointer-events: none;
   }
