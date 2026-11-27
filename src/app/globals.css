@@ -87,7 +87,7 @@
     --ticket-edge-depth: 0.25rem;
     --ticket-edge-pitch: 0.5rem;
     --stub-width: 4.5rem;
-    --seam-notch: 6px;
+    --seam-notch: 4px;
     --seam-outline: calc(var(--seam-notch) + 1px);
     /* Blend only the half pixel around each curved edge. */
     --notch-antialias: 0.25px;

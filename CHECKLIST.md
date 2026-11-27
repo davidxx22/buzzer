@@ -30,7 +30,7 @@
 - [x] Verify the business logo appears in the navbar, the dropdown opens the staff queue, and Escape closes it and returns focus to the logo.
 - [x] Verify the white dashed perforation sits 2px inside the colored number stub for Waiting, Ready, and Collected orders.
 - [x] Verify staff tickets of different heights and customer pickup tickets use whole, fixed-size scallops at normal zoom.
-- [x] Verify the ticket cutouts have a smooth, crisp outline and the white dashes stop short of the notches.
+- [x] Verify the 4px staff seam notches have a smooth outline and the white dashes stop short of both cutouts.
 - [x] Verify staff timers persist after refresh in both demo modes and disappear on collection.
 - [x] Verify elapsed waiting time updates every second and a new timer starts when staff mark the order ready.
 - [x] Verify the Ready for pickup and Waiting orders headings appear without horizontal lines.
