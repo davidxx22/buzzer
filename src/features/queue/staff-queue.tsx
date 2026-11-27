@@ -172,6 +172,7 @@ export function StaffQueue() {
                               )}
                               {ticket.status !== "collected" && (
                                 <Button
+                                  className="w-24"
                                   aria-label={`${action} for ${label}`}
                                   aria-disabled={pendingId !== null}
                                   onClick={(event) => void advanceTicket(ticket, event.currentTarget)}
