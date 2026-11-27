@@ -140,7 +140,7 @@ export function StaffQueue() {
                 {visibleSections.map(({ label: sectionLabel, orders }) => (
                   <div key={sectionLabel}>
                     {view === "active" && (
-                      <h2 className="mb-2 flex items-center gap-3 text-sm font-semibold after:h-px after:flex-1 after:bg-border">
+                      <h2 className="mb-2 text-sm font-semibold">
                         {sectionLabel}
                       </h2>
                     )}

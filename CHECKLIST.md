@@ -33,6 +33,7 @@
 - [x] Verify the ticket cutouts have a smooth, crisp outline and the white dashes stop short of the notches.
 - [x] Verify staff timers persist after refresh in both demo modes and disappear on collection.
 - [x] Verify elapsed waiting time updates every second and a new timer starts when staff mark the order ready.
+- [x] Verify the Ready for pickup and Waiting orders headings appear without horizontal lines.
 
 ## Later phases
 
