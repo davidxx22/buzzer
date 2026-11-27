@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
-  --background: #211b22;
+  color-scheme: light;
+  --background: #e7e5e4;
   --foreground: var(--paper-light-ink);
   --card: #2b242c;
   --muted: #40343e;
@@ -28,7 +28,6 @@
 
 .staff-theme {
   color-scheme: light;
-  --background: #ffffff;
   --foreground: #211b22;
   --card: #ffffff;
   --muted: #f3f2f3;
@@ -193,7 +192,7 @@
 
 @layer base {
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply bg-background font-sans text-paper-ink antialiased;
   }
 
   :focus-visible {
