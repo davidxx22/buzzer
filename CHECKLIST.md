@@ -28,7 +28,7 @@
 - [x] Verify the staff page’s white backdrop, shadowed white queue card, and white navbar on desktop and mobile. Verify primary buttons use #008000 with white text.
 - [x] Verify that opening the customer QR link replaces the QR with an in-dialog confirmation before closing. Staff previews and QR links from an earlier dialog leave the current dialog open.
 - [x] Verify the business logo appears in the navbar, the dropdown opens the staff queue, and Escape closes it and returns focus to the logo.
-- [x] Verify the dashed perforation is visible along the order number stub for Waiting, Ready, and Collected orders.
+- [x] Verify the dashed perforation lines up with the colored edge of the number stub for Waiting, Ready, and Collected orders.
 
 ## Later phases
 
