@@ -26,7 +26,7 @@ The staff **Open ticket** button previews the ticket and leaves the dialog open.
 
 The cashier’s browser keeps the order. Vercel’s temporary cache shares its status with the phone, so this demo needs no database. Reopen **Show QR** to publish the current status if a live link has expired or the original QR was created before live updates were added.
 
-Staff tickets show elapsed minutes while waiting and a minutes-and-seconds timer after **Mark ready**. Timers survive a refresh in both demo modes. Previously saved orders get a timer the next time staff mark them ready.
+Staff tickets show elapsed minutes and seconds while waiting. **Mark ready** starts a new timer for the time since the order became ready. Timers survive a refresh in both demo modes. Orders saved before timers were added get a timer the next time staff mark them ready.
 
 ## Test on a local Wi-Fi network
 

@@ -31,7 +31,8 @@
 - [x] Verify the white dashed perforation sits 2px inside the colored number stub for Waiting, Ready, and Collected orders.
 - [x] Verify the staff tickets have a rounded side cutout and two perforation notches on desktop, with the original status colors.
 - [x] Verify the ticket cutouts have a smooth, crisp outline and the white dashes stop short of the notches.
-- [x] Verify staff timers show waiting minutes and elapsed time since ready, persist after refresh in both demo modes, and disappear on collection.
+- [x] Verify staff timers persist after refresh in both demo modes and disappear on collection.
+- [x] Verify elapsed waiting time updates every second and a new timer starts when staff mark the order ready.
 
 ## Later phases
 
