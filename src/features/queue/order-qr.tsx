@@ -1,5 +1,6 @@
+import { Check } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { shareBrowserOrder } from "./browser-store";
 import { formatTicketNumber, orderSummary, type OrderSource, type PickupOrder } from "./model";
@@ -9,15 +10,18 @@ import { isPickupTicketOpened, prepareSharedPickupQr } from "./ticket-status";
 
 type PreparedQr = { url: URL; live: boolean; scanId?: string; liveId?: string };
 
-export function OrderQr({ order, source, onOpened }: {
+export function OrderQr({ order, source, onClose }: {
   order: PickupOrder;
   source: OrderSource;
-  onOpened: (order: PickupOrder) => void;
+  onClose: () => void;
 }) {
   const pickup = formatTicketNumber(order);
   const [qr, setQr] = useState<PreparedQr | "error" | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [expired, setExpired] = useState(false);
+  const [opened, setOpened] = useState(false);
+  const confirmationHeading = useRef<HTMLHeadingElement>(null);
+  const confirmationDetails = useId();
 
   useEffect(() => {
     let active = true;
@@ -62,7 +66,7 @@ export function OrderQr({ order, source, onOpened }: {
       const opened = await isPickupTicketOpened(order.id, scanId, liveId).catch(() => false);
       if (!active) return;
       if (opened) {
-        onOpened(order);
+        setOpened(true);
       } else {
         timer = window.setTimeout(check, 2500);
       }
@@ -73,7 +77,31 @@ export function OrderQr({ order, source, onOpened }: {
       active = false;
       window.clearTimeout(timer);
     };
-  }, [onOpened, order, qr]);
+  }, [order.id, qr]);
+
+  useEffect(() => {
+    if (!opened) return;
+
+    confirmationHeading.current?.focus();
+    const timer = window.setTimeout(onClose, 3000);
+    return () => window.clearTimeout(timer);
+  }, [onClose, opened]);
+
+  if (opened) {
+    return (
+      <div className="flex min-h-72 flex-col items-center justify-center gap-4 px-4 py-8 text-center">
+        <div className="grid size-20 place-items-center rounded-full bg-primary/10 text-primary">
+          <Check size={36} strokeWidth={2.5} aria-hidden="true" />
+        </div>
+        <div>
+          <h3 ref={confirmationHeading} tabIndex={-1} aria-describedby={confirmationDetails} className="rounded-sm text-xl font-bold">
+            Pickup ticket opened
+          </h3>
+          <p id={confirmationDetails} className="mt-2 text-sm text-muted-foreground">The customer opened ticket {pickup}.</p>
+        </div>
+      </div>
+    );
+  }
 
   const customerUrl = qr && qr !== "error" ? new URL(qr.url) : null;
   if (customerUrl && qr && qr !== "error" && qr.scanId) customerUrl.searchParams.set("scan", qr.scanId);

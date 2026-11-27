@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ClipboardList, Plus, QrCode } from "lucide-react";
+import { ClipboardList, Plus, QrCode } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,6 @@ export function StaffQueue() {
   const [view, setView] = useState<QueueView>("active");
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
-  const [qrConfirmation, setQrConfirmation] = useState("");
   const [error, setError] = useState("");
   const [dialog, setDialog] = useState<QueueDialog | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -30,10 +29,8 @@ export function StaffQueue() {
   const activeFilter = useRef<HTMLButtonElement>(null);
   const orderDialog = useRef<HTMLDialogElement>(null);
 
-  const confirmTicketOpened = useCallback((order: PickupOrder) => {
-    if (!orderDialog.current?.open) return;
-    orderDialog.current.close();
-    setQrConfirmation(`Customer opened pickup ticket ${formatTicketNumber(order)}.`);
+  const closeOrderDialog = useCallback(() => {
+    orderDialog.current?.close();
   }, []);
 
   async function advanceTicket(ticket: QueueTicket, trigger: HTMLButtonElement) {
@@ -101,7 +98,6 @@ export function StaffQueue() {
         </div>
         <Button type="button" disabled={state.kind !== "loaded"} onClick={() => {
           setCreateError("");
-          setQrConfirmation("");
           setDialog({ kind: "create" });
         }}>
           <Plus size={18} strokeWidth={1.75} aria-hidden="true" />
@@ -125,14 +121,6 @@ export function StaffQueue() {
               </Button>
             </div>
             <p role="status" aria-atomic="true" className="sr-only">{announcement}</p>
-            <div role="status" aria-atomic="true">
-              {qrConfirmation && (
-                <p className="mb-4 flex items-center gap-2 rounded-lg border border-border bg-ready-surface p-3 text-sm font-semibold text-ready-ink">
-                  <Check size={16} aria-hidden="true" />
-                  {qrConfirmation}
-                </p>
-              )}
-            </div>
             {error && <p role="alert" className="mb-4 rounded-lg bg-danger-surface p-3 text-sm font-medium text-danger">{error}</p>}
 
             {visibleSections.length ? (
@@ -162,10 +150,7 @@ export function StaffQueue() {
                             </div>
                             <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-auto md:justify-end md:px-4">
                               {isPickupOrder(ticket) && (
-                                <Button variant="outline" aria-label={`Show QR for ${label}`} onClick={() => {
-                                  setQrConfirmation("");
-                                  setDialog({ kind: "qr", order: ticket, source: state.source });
-                                }}>
+                                <Button variant="outline" aria-label={`Show QR for ${label}`} onClick={() => setDialog({ kind: "qr", order: ticket, source: state.source })}>
                                   <QrCode size={18} strokeWidth={1.75} aria-hidden="true" />
                                   Show QR
                                 </Button>
@@ -204,7 +189,7 @@ export function StaffQueue() {
           {dialog.kind === "create" ? (
             <OrderForm busy={isCreating} error={createError} onCreate={(id, details) => void submitOrder(id, details)} />
           ) : (
-            <OrderQr order={dialog.order} source={dialog.source} onOpened={confirmTicketOpened} />
+            <OrderQr order={dialog.order} source={dialog.source} onClose={closeOrderDialog} />
           )}
         </Dialog>
       )}

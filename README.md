@@ -20,7 +20,7 @@ npm run build
 
 ## Test on the hosted demo
 
-Open [Buzzer Staff](https://buzzerrr.vercel.app/staff/), create an order, scan its QR with a phone, and open the link. The staff dialog closes and confirms which ticket was opened. Keep the ticket open while staff mark the order ready and collected. The phone updates automatically and shows a simulated alert when the order is ready.
+Open [Buzzer Staff](https://buzzerrr.vercel.app/staff/), create an order, scan its QR with a phone, and open the link. The staff dialog replaces the QR with a confirmation for three seconds, then closes. Keep the ticket open while staff mark the order ready and collected. The phone updates automatically and shows a simulated alert when the order is ready.
 
 The staff **Open ticket** button previews the ticket and leaves the dialog open. Each new QR display checks for a ticket opening for five minutes. The pickup link remains usable after that check ends.
 
@@ -38,7 +38,7 @@ npm run demo:shared
 Use a private Wi-Fi network and fictional orders. Connect both devices to that network. Open the printed Wi-Fi address on the cashier device so the QR contains an address the phone can reach.
 
 1. In **Staff**, select **New order**. Create **#01** with one **Matcha coffee**, then **#02** with one **Iced latte**. Use **Add item** when an order includes more than one item.
-2. Reopen **Show QR** for **#01**, scan it with the phone camera, and open the link. Check that the staff dialog closes and shows the confirmation. The phone should show **#01**, **1 × Matcha coffee**, and **Waiting**. Keep the ticket open for the pickup alert.
+2. Reopen **Show QR** for **#01**, scan it with the phone camera, and open the link. Check that the staff dialog shows the confirmation in place of the QR and then closes. The phone should show **#01**, **1 × Matcha coffee**, and **Waiting**. Keep the ticket open for the pickup alert.
 3. Mark **#02** ready first. The matcha ticket stays **Waiting**.
 4. Mark **#01** ready. The phone shows **Ready for pickup** and a **Simulated pickup alert**. Mark it collected and confirm it moves to **Collected orders**.
 

@@ -26,7 +26,7 @@
 - [x] Verify collected pickup tickets and staff number stubs both use #A8A29E with dark text.
 - [x] Verify staff ticket stubs show “No.” above the padded order number in every order state.
 - [x] Verify the staff page’s white backdrop, shadowed white queue card, and white navbar on desktop and mobile. Verify primary buttons use #008000 with white text.
-- [x] Verify that opening the customer QR link closes the staff dialog and confirms the order. Staff previews and QR links from an earlier dialog leave the current dialog open.
+- [x] Verify that opening the customer QR link replaces the QR with an in-dialog confirmation before closing. Staff previews and QR links from an earlier dialog leave the current dialog open.
 
 ## Later phases
 
