@@ -97,7 +97,9 @@
       radial-gradient(circle at var(--stub-width) top, transparent calc(var(--seam-notch) - var(--notch-antialias)), black calc(var(--seam-notch) + var(--notch-antialias))) intersect,
       radial-gradient(circle at var(--stub-width) bottom, transparent calc(var(--seam-notch) - var(--notch-antialias)), black calc(var(--seam-notch) + var(--notch-antialias))) intersect,
       linear-gradient(black, black) right / calc(100% - var(--ticket-edge-depth)) 100% no-repeat,
-      radial-gradient(ellipse 100% 50% at right center, black 87.5%, transparent 100%) left center / var(--ticket-edge-depth) var(--ticket-edge-pitch) no-repeat round;
+      /* Keep each scallop at a fixed size and overlap the solid mask by 1px. */
+      radial-gradient(circle at var(--ticket-edge-depth) center, black calc(var(--ticket-edge-depth) - 0.5px), transparent var(--ticket-edge-depth))
+        left center / calc(var(--ticket-edge-depth) + 1px) var(--ticket-edge-pitch) no-repeat space;
   }
 
   .staff-ticket::before {
@@ -138,10 +140,10 @@
 
   .ticket-edge::after {
     position: absolute;
-    inset: 100% 0 auto;
+    inset: 100% 2px auto;
     height: var(--ticket-edge-depth);
-    background: radial-gradient(ellipse 50% 100% at center top, var(--paper, var(--paper-cream)) 83.33%, transparent 100%)
-      center top / var(--ticket-edge-pitch) var(--ticket-edge-depth) round no-repeat;
+    background: radial-gradient(circle at center top, var(--paper, var(--paper-cream)) calc(var(--ticket-edge-depth) - 0.5px), transparent var(--ticket-edge-depth))
+      center top / var(--ticket-edge-pitch) var(--ticket-edge-depth) space no-repeat;
     content: "";
     pointer-events: none;
   }
