@@ -2,11 +2,10 @@
 
 import { ClipboardList, Plus, QrCode } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
-import { formatTicketNumber, isPickupOrder, nextStatus, orderSummary, statusLabels, type OrderDetails as OrderDetailsData, type OrderSource, type PickupOrder, type QueueTicket } from "./model";
+import { formatTicketNumber, isPickupOrder, nextStatus, type OrderDetails as OrderDetailsData, type OrderSource, type PickupOrder, type QueueTicket } from "./model";
 import { OrderDetails } from "./order-details";
 import { OrderForm } from "./order-form";
 import { OrderQr } from "./order-qr";
@@ -177,15 +176,15 @@ export function StaffQueue() {
                               <span className="text-xs leading-none font-semibold">No.</span>
                               <span className="font-display text-[2.125rem] leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-[2.5rem]">{number}</span>
                             </div>
-                            <div className="flex min-w-0 justify-between gap-2 px-3 pt-3 md:gap-4 md:px-4 md:pb-3">
-                              <div className="min-w-0 self-center">
-                                {ticket.status === "collected" && <Badge variant="collected">{statusLabels.collected}</Badge>}
-                                {ticket.status === "collected" && ticket.items && <p className="text-sm leading-5 text-foreground mt-2 [overflow-wrap:anywhere]">{orderSummary(ticket.items)}</p>}
-                                {ticket.notes && <p className="text-sm leading-5 whitespace-pre-wrap text-muted-foreground not-first:mt-1 [overflow-wrap:anywhere]">{ticket.notes}</p>}
+                            {ticket.status !== "collected" && (
+                              <div className="flex min-w-0 justify-between gap-2 px-3 pt-3 md:gap-4 md:px-4 md:pb-3">
+                                <div className="min-w-0 self-center">
+                                  {ticket.notes && <p className="text-sm leading-5 whitespace-pre-wrap text-muted-foreground [overflow-wrap:anywhere]">{ticket.notes}</p>}
+                                </div>
+                                <TicketTimer ticket={ticket} now={now} />
                               </div>
-                              <TicketTimer ticket={ticket} now={now} />
-                            </div>
-                            <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-auto md:justify-end md:px-4">
+                            )}
+                            <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-3 md:justify-end md:px-4">
                               {isPickupOrder(ticket) && (
                                 <Button
                                   variant="outline"
