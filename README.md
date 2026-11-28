@@ -26,7 +26,7 @@ The staff **Open ticket** button previews the ticket and leaves the dialog open.
 
 The cashier’s browser keeps the order. Vercel’s temporary cache shares its status and items with the phone, so this demo needs no database. Reopen the QR from the ticket’s QR icon to publish the current order if a live link has expired.
 
-Select the ticket number to see the items, quantities, and notes. While an order is waiting, **Edit order** lets staff add items, change quantities, or update notes. Saving keeps the same order number and waiting timer. Open live pickup tickets show the updated items. Once staff select **Notify**, the order is read-only.
+Select **Details** beside the QR icon to see the items, quantities, and notes. While an order is waiting, **Edit order** lets staff add items, change quantities, or update notes. Saving keeps the same order number and waiting timer. Open live pickup tickets show the updated items. Once staff select **Notify**, the order is read-only.
 
 Staff tickets show elapsed minutes and seconds while waiting. **Notify** starts a new timer for the time since the order became ready. Timers survive a refresh in both demo modes. Orders saved before timers were added get a timer the next time staff mark them ready.
 

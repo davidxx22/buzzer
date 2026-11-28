@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, ClipboardList, Plus, QrCode } from "lucide-react";
+import { ClipboardList, Plus, QrCode } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -170,21 +170,13 @@ export function StaffQueue() {
                         const action = ticket.status === "waiting" ? "Notify" : "Collected";
                         return (
                           <li key={ticket.id} className="staff-ticket grid overflow-hidden rounded-r-lg border border-l-0 border-border bg-card md:items-center">
-                            <button
-                              type="button"
-                              className="ticket-paper staff-ticket-number row-span-2 grid cursor-pointer content-center gap-px self-stretch px-2 py-3 text-center hover:brightness-95 focus-visible:-outline-offset-8 focus-visible:outline-current md:row-span-1"
+                            <div
+                              className="ticket-paper staff-ticket-number row-span-2 grid content-center gap-px self-stretch px-2 py-3 text-center md:row-span-1"
                               data-tone={ticket.status}
-                              aria-label={`Order details for ${label}`}
-                              onClick={() => {
-                                setFormError("");
-                                setDialog({ kind: "details", ticket });
-                              }}
                             >
-                              <span className="flex items-center justify-center gap-0.5 text-xs leading-none font-semibold">
-                                No.<ChevronRight size={12} aria-hidden="true" />
-                              </span>
+                              <span className="text-xs leading-none font-semibold">No.</span>
                               <span className="font-display text-[2.125rem] leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-[2.5rem]">{number}</span>
-                            </button>
+                            </div>
                             <div className="flex min-w-0 justify-between gap-2 px-3 pt-3 md:gap-4 md:px-4 md:pb-3">
                               <div className="min-w-0 self-center">
                                 {ticket.status === "collected" && <Badge variant="collected">{statusLabels.collected}</Badge>}
@@ -205,6 +197,18 @@ export function StaffQueue() {
                                   <QrCode size={18} aria-hidden="true" />
                                 </Button>
                               )}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="px-2 sm:px-4"
+                                aria-label={`Details for ${label}`}
+                                onClick={() => {
+                                  setFormError("");
+                                  setDialog({ kind: "details", ticket });
+                                }}
+                              >
+                                Details
+                              </Button>
                               {ticket.status !== "collected" && (
                                 <Button
                                   className="w-24"
