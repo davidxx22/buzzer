@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Plus, QrCode } from "lucide-react";
+import { ChevronDown, ClipboardList, Plus, QrCode } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -162,16 +162,17 @@ export function StaffQueue() {
                 </Button>
               </div>
               {view === "collected" && visibleSections.length > 0 && (
-                <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  Sort by
+                <label className="relative inline-grid max-w-full items-center text-sm">
+                  <span className="pointer-events-none absolute start-3 text-muted-foreground">Sort by</span>
                   <select
-                    className="min-h-11 rounded-lg border border-border bg-card px-3 text-foreground"
+                    className="min-h-11 max-w-full cursor-pointer appearance-none rounded-lg border border-border bg-card ps-16 pe-9 font-medium text-foreground transition-colors hover:bg-muted forced-colors:appearance-auto forced-colors:pe-3"
                     value={collectedSort}
                     onChange={(event) => setCollectedSort(event.target.value === "number" ? "number" : "latest")}
                   >
                     <option value="latest">Latest collected</option>
                     <option value="number">Ticket number</option>
                   </select>
+                  <ChevronDown size={16} strokeWidth={1.5} className="pointer-events-none absolute end-3 text-muted-foreground forced-colors:hidden" aria-hidden="true" />
                 </label>
               )}
             </div>
