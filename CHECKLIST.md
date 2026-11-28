@@ -38,6 +38,7 @@
 - [x] Verify the Ready for pickup and Waiting orders headings appear without horizontal lines.
 - [x] Verify active staff tickets show timers and notes, with item summaries available in Details, the QR dialog, and the customer ticket.
 - [x] Verify collected rows show the ticket number, QR icon, and Details, with items, notes, and status available in the Details dialog.
+- [x] Verify Collected orders defaults to most recently collected and can be sorted by ascending ticket number.
 - [x] Verify Notify marks an order ready and shows the pickup alert, and Collected moves it to Collected orders.
 - [x] Verify the QR icon opens the pickup dialog and Notify and Collected have matching dimensions.
 - [x] Verify the Details button sits between the QR icon and Notify or Collected, opens Order details, and offers editing only for waiting orders.

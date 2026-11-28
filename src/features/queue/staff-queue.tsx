@@ -16,6 +16,7 @@ import { TicketTimer } from "./ticket-timer";
 import { useQueue } from "./use-queue";
 
 type QueueView = "active" | "collected";
+type CollectedSort = "latest" | "number";
 type QueueDialog =
   | { kind: "create" }
   | { kind: "qr"; order: PickupOrder; source: OrderSource }
@@ -25,6 +26,7 @@ type QueueDialog =
 export function StaffQueue() {
   const { state, refresh } = useQueue();
   const [view, setView] = useState<QueueView>("active");
+  const [collectedSort, setCollectedSort] = useState<CollectedSort>("latest");
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [error, setError] = useState("");
@@ -116,7 +118,15 @@ export function StaffQueue() {
       ]
     : [{ label: "Collected orders", status: "collected" }];
   const visibleSections = sections
-    .map(({ label, status }) => ({ label, orders: tickets.filter((ticket) => ticket.status === status) }))
+    .map(({ label, status }) => {
+      const orders = tickets.filter((ticket) => ticket.status === status);
+      if (status === "collected") {
+        orders.sort((a, b) => collectedSort === "number"
+          ? a.number - b.number
+          : (b.statusStartedAt ?? -1) - (a.statusStartedAt ?? -1) || b.number - a.number);
+      }
+      return { label, orders };
+    })
     .filter(({ orders }) => orders.length > 0);
 
   return (
@@ -142,13 +152,28 @@ export function StaffQueue() {
           <div className="mt-6"><QueueCounts tickets={tickets} /></div>
 
           <div className="mt-6 border-t border-border pt-4">
-            <div className="mb-4 flex flex-wrap gap-2">
-              <Button ref={activeFilter} variant={view === "active" ? "default" : "ghost"} aria-pressed={view === "active"} onClick={() => setView("active")}>
-                Active orders
-              </Button>
-              <Button variant={view === "collected" ? "default" : "ghost"} aria-pressed={view === "collected"} onClick={() => setView("collected")}>
-                Collected orders
-              </Button>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap gap-2">
+                <Button ref={activeFilter} variant={view === "active" ? "default" : "ghost"} aria-pressed={view === "active"} onClick={() => setView("active")}>
+                  Active orders
+                </Button>
+                <Button variant={view === "collected" ? "default" : "ghost"} aria-pressed={view === "collected"} onClick={() => setView("collected")}>
+                  Collected orders
+                </Button>
+              </div>
+              {view === "collected" && visibleSections.length > 0 && (
+                <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  Sort by
+                  <select
+                    className="min-h-11 rounded-lg border border-border bg-card px-3 text-foreground"
+                    value={collectedSort}
+                    onChange={(event) => setCollectedSort(event.target.value === "number" ? "number" : "latest")}
+                  >
+                    <option value="latest">Latest collected</option>
+                    <option value="number">Ticket number</option>
+                  </select>
+                </label>
+              )}
             </div>
             <p role="status" aria-atomic="true" className="sr-only">{announcement}</p>
             {error && <p role="alert" className="mb-4 rounded-lg bg-danger-surface p-3 text-sm font-medium text-danger">{error}</p>}
