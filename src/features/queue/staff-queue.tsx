@@ -3,7 +3,6 @@
 import { ClipboardList, Plus, QrCode } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { CollectedSortMenu, type CollectedSort } from "./collected-sort-menu";
 import { formatTicketNumber, isPickupOrder, nextStatus, type OrderDetails as OrderDetailsData, type OrderSource, type PickupOrder, type QueueTicket } from "./model";
@@ -145,8 +144,8 @@ export function StaffQueue() {
     .filter(({ orders }) => orders.length > 0);
 
   return (
-    <Card className="mx-auto my-8 w-[calc(100%-2rem)] max-w-[68rem] border-0 p-3 shadow-lg shadow-black/10 sm:my-12 sm:w-[calc(100%-4rem)] sm:p-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 sm:mt-8">
         <div>
           <h1 className="font-display text-5xl leading-none font-semibold sm:text-6xl">Order queue</h1>
           <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Mark orders ready for pickup, then close each ticket when it’s collected.</p>
@@ -294,7 +293,7 @@ export function StaffQueue() {
           )}
         </Dialog>
       )}
-    </Card>
+    </>
   );
 }
 
