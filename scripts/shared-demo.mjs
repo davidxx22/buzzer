@@ -10,7 +10,7 @@ const dataDirectory = resolve(process.env.BUZZER_DATA_DIR ?? ".buzzer");
 const dataFile = join(dataDirectory, "orders.json");
 const host = process.env.BUZZER_HOST ?? "0.0.0.0";
 const port = Number(process.env.PORT ?? 3000);
-const mime = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "application/javascript", ".txt": "text/plain; charset=utf-8", ".png": "image/png" };
+const mime = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "application/javascript", ".txt": "text/plain; charset=utf-8", ".png": "image/png", ".svg": "image/svg+xml" };
 const { redirects } = JSON.parse(await readFile("vercel.json", "utf8"));
 
 const home = await readFile(join(staticDirectory, "index.html")).catch(() => {

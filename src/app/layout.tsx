@@ -6,6 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "Buzzer", template: "%s | Buzzer" },
   description: "Manage the restaurant order queue and mark orders ready for pickup or collected.",
+  icons: { icon: { url: "/buzzer-icon.svg", type: "image/svg+xml" } },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
