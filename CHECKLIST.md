@@ -29,7 +29,7 @@
 - [x] Verify the staff queue cards and dialog use #FAFAF9. Verify primary buttons use #008000 with #FAFAF9 text.
 - [x] Verify the homepage, staff queue, and pickup ticket render without a navbar, and the homepage’s Open staff view link still opens the queue.
 - [x] Verify the supplied coffee shop mark is the only logo above the homepage, staff queue, and pickup ticket and renders about 48px wide.
-- [x] Verify the staff queue has no outer card. On desktop and phones, the standalone logo aligns with the content gutter, and the three metric columns, divider, and waiting and ready ticket rows span the available width.
+- [x] Verify the staff queue is centered directly on the light gray page, with a 1040px desktop width cap and responsive side gutters. The standalone logo, metric grid, divider, and ticket rows align to the same column.
 - [x] Verify waiting, ready, and collected staff tickets use the larger number and taller row styling, with perforations and active timers intact.
 - [x] Verify the shared demo serves the SVG favicon with its correct media type.
 - [x] Verify that opening the customer QR link replaces the QR with an in-dialog confirmation before closing. Staff previews and QR links from an earlier dialog leave the current dialog open.

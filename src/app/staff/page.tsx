@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Staff queue" };
 
 export default function StaffPage() {
   return (
-    <div className="staff-theme px-4 pt-2.5 pb-8 text-foreground sm:px-8 sm:pb-12">
+    <div className="staff-theme mx-auto w-[calc(100%-2rem)] max-w-[65rem] pt-2.5 pb-8 text-foreground sm:w-[calc(100%-4rem)] sm:pb-12">
       <CoffeeShopLogo />
       <StaffQueue />
     </div>
