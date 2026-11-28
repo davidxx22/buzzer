@@ -166,7 +166,7 @@ export function StaffQueue() {
                   <span className="shrink-0 text-muted-foreground">Sort by:</span>
                   <span className="relative grid min-w-0 items-center">
                     <select
-                      className="min-h-11 max-w-full cursor-pointer appearance-none rounded-lg bg-card ps-3 pe-9 font-medium text-foreground transition-colors hover:bg-muted focus:outline-none focus-visible:bg-border forced-colors:appearance-auto forced-colors:pe-3 forced-colors:focus-visible:bg-[Highlight] forced-colors:focus-visible:text-[HighlightText] forced-colors:focus-visible:forced-color-adjust-none"
+                      className="min-h-11 max-w-full cursor-pointer appearance-none rounded-lg bg-card ps-3 pe-9 font-medium text-foreground focus:outline-none forced-colors:appearance-auto forced-colors:pe-3"
                       value={collectedSort}
                       onChange={(event) => setCollectedSort(event.target.value === "number" ? "number" : "latest")}
                     >
