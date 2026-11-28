@@ -1,18 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { formatTicketNumber, statusLabels, type QueueTicket } from "./model";
+import { OrderTicketHeader } from "./order-ticket-header";
 
 export function OrderDetails({ ticket, error, onEdit }: { ticket: QueueTicket; error: string; onEdit?: () => void }) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <p className="font-display text-4xl leading-none font-semibold tabular-nums">{formatTicketNumber(ticket)}</p>
-        <p className="text-sm font-medium text-muted-foreground">{statusLabels[ticket.status]}</p>
-      </div>
+      <OrderTicketHeader number={formatTicketNumber(ticket)}>
+        <p className="font-medium">{statusLabels[ticket.status]}</p>
+      </OrderTicketHeader>
       {ticket.items ? (
-        <ul aria-label="Order items" className="divide-y divide-border rounded-lg border border-border">
+        <ul aria-label="Order items" className="divide-y divide-border border-b border-border">
           {ticket.items.map(({ name, quantity }, index) => (
-            <li key={index} className="flex gap-3 px-4 py-3 text-sm">
-              <span className="shrink-0 font-semibold tabular-nums">{quantity} ×</span>
+            <li key={index} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 px-3 py-2 text-sm">
+              <span className="text-end font-medium text-muted-foreground tabular-nums">{quantity} ×</span>
               <span className="min-w-0 [overflow-wrap:anywhere]">{name}</span>
             </li>
           ))}

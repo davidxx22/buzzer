@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { shareBrowserOrder } from "./browser-store";
 import { formatTicketNumber, orderSummary, type OrderSource, type PickupOrder } from "./model";
+import { OrderTicketHeader } from "./order-ticket-header";
 import { getTicketUrl } from "./ticket-link";
 import { qrConfirmationTtl } from "./ticket-rules.mjs";
 import { isPickupTicketOpened, prepareSharedPickupQr } from "./ticket-status";
@@ -89,12 +90,12 @@ export function OrderQr({ order, source, onClose }: {
 
   if (opened) {
     return (
-      <div className="flex min-h-72 flex-col items-center justify-center gap-4 px-4 py-8 text-center">
-        <div className="grid size-20 place-items-center rounded-full bg-primary/10 text-primary">
-          <Check size={36} strokeWidth={2.5} aria-hidden="true" />
+      <div className="grid min-h-60 content-center justify-items-center gap-4 px-4 py-6 text-center">
+        <div className="grid size-14 place-items-center rounded-full bg-primary/10 text-primary">
+          <Check size={24} strokeWidth={1.75} aria-hidden="true" />
         </div>
         <div>
-          <h3 ref={confirmationHeading} tabIndex={-1} aria-describedby={confirmationDetails} className="rounded-sm text-xl font-bold">
+          <h3 ref={confirmationHeading} tabIndex={-1} aria-describedby={confirmationDetails} className="rounded-sm text-lg font-semibold">
             Pickup ticket opened
           </h3>
           <p id={confirmationDetails} className="mt-2 text-sm text-muted-foreground">The customer opened ticket {pickup}.</p>
@@ -108,50 +109,53 @@ export function OrderQr({ order, source, onClose }: {
   const isLoopback = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname);
 
   return (
-    <div className="flex flex-col items-center gap-3 text-center">
-      <p className="text-4xl font-bold tabular-nums tracking-tight">{pickup}</p>
-      <p className="break-words text-sm text-muted-foreground">{orderSummary(order.items)}</p>
-      {order.notes && <p className="max-w-full break-words text-sm text-muted-foreground">{order.notes}</p>}
-      {qr === null && <p role="status" className="text-sm text-muted-foreground">Preparing pickup QR…</p>}
+    <div className="space-y-4">
+      <OrderTicketHeader number={pickup}>
+        <p className="font-medium">{orderSummary(order.items)}</p>
+        {order.notes && <p className="whitespace-pre-wrap text-muted-foreground">{order.notes}</p>}
+      </OrderTicketHeader>
+      {qr === null && <p role="status" className="text-center text-sm text-muted-foreground">Preparing pickup QR…</p>}
       {qr === "error" && (
-        <>
+        <div className="grid justify-items-center gap-2 text-center">
           <p role="alert" className="text-sm text-danger">The live pickup QR couldn’t be prepared.</p>
           <Button variant="outline" onClick={() => {
             setQr(null);
             setExpired(false);
             setAttempt((current) => current + 1);
           }}>Try again</Button>
-        </>
+        </div>
       )}
       {qr && qr !== "error" && customerUrl && (
-        <>
+        <div className="grid min-w-0 justify-items-center gap-2 text-center">
           <QRCodeCanvas
             value={customerUrl.href}
             bgColor="#fafaf9"
             size={264}
             level="L"
             marginSize={4}
-            className="max-w-full"
+            className="block"
             style={{ maxWidth: "100%", height: "auto" }}
             role="img"
             aria-label={`Pickup QR for ${pickup}`}
           />
-          <p className="text-sm text-muted-foreground">
-            {isLoopback && source === "shared"
-              ? "Open the Staff queue at the shared demo’s Wi-Fi address to scan from a phone."
-              : qr.live
-                ? "Scan to open a live pickup ticket on your phone."
-                : "Scan to open a snapshot of this ticket."}
-          </p>
-          {qr.scanId && (
-            <p role="status" className="text-sm text-muted-foreground">
-              {expired ? "Reopen the QR to check for a new ticket opening." : "Waiting for the customer to open the ticket…"}
+          <div className="space-y-1 text-sm">
+            <p className="font-medium">
+              {isLoopback && source === "shared"
+                ? "Use the shared demo’s Wi-Fi address to scan from a phone"
+                : qr.live
+                  ? "Scan to open your pickup ticket"
+                  : "Scan to open a snapshot of this ticket"}
             </p>
-          )}
+            {qr.scanId && (
+              <p role="status" className="text-muted-foreground">
+                {expired ? "Reopen the QR to check for a new ticket opening" : "Waiting for the customer to open the ticket…"}
+              </p>
+            )}
+          </div>
           <Button asChild variant="outline">
             <a href={qr.url.href} target="_blank" rel="noreferrer">Open ticket</a>
           </Button>
-        </>
+        </div>
       )}
     </div>
   );
