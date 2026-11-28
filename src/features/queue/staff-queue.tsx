@@ -1,7 +1,7 @@
 "use client";
 
 import { ClipboardList, Plus, QrCode } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
@@ -12,7 +12,7 @@ import { OrderForm } from "./order-form";
 import { OrderQr } from "./order-qr";
 import { advanceOrder, createOrder, editOrder } from "./order-store";
 import { QueueCounts } from "./queue-counts";
-import { QueueError } from "./queue-feedback";
+import { EmptyActiveQueue, QueueError } from "./queue-feedback";
 import { TicketTimer } from "./ticket-timer";
 import { useQueue } from "./use-queue";
 
@@ -35,7 +35,22 @@ export function StaffQueue() {
   const [formError, setFormError] = useState("");
   const [now, setNow] = useState<number | null>(null);
   const activeFilter = useRef<HTMLButtonElement>(null);
+  const newOrderButton = useRef<HTMLButtonElement>(null);
+  const createOrderTrigger = useRef<HTMLButtonElement>(null);
   const orderDialog = useRef<HTMLDialogElement>(null);
+
+  function openNewOrder(event: MouseEvent<HTMLButtonElement>) {
+    createOrderTrigger.current = event.currentTarget;
+    setFormError("");
+    setDialog({ kind: "create" });
+  }
+
+  function dismissOrderDialog() {
+    const trigger = createOrderTrigger.current;
+    createOrderTrigger.current = null;
+    setDialog(null);
+    if (trigger && !trigger.isConnected) newOrderButton.current?.focus();
+  }
 
   const closeOrderDialog = useCallback(() => {
     orderDialog.current?.close();
@@ -136,10 +151,7 @@ export function StaffQueue() {
           <h1 className="font-display text-5xl leading-none font-semibold sm:text-6xl">Order queue</h1>
           <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Mark orders ready for pickup, then close each ticket when it’s collected.</p>
         </div>
-        <Button type="button" disabled={state.kind !== "loaded"} onClick={() => {
-          setFormError("");
-          setDialog({ kind: "create" });
-        }}>
+        <Button ref={newOrderButton} type="button" disabled={state.kind !== "loaded"} onClick={openNewOrder}>
           <Plus size={18} strokeWidth={1.75} aria-hidden="true" />
           New order
         </Button>
@@ -241,12 +253,14 @@ export function StaffQueue() {
                   </div>
                 ))}
               </div>
+            ) : view === "active" ? (
+              <EmptyActiveQueue onNewOrder={openNewOrder} />
             ) : (
               <div className="rounded-lg border border-border bg-card px-6 py-10 text-center">
                 <ClipboardList size={20} strokeWidth={1.75} className="mx-auto text-primary" aria-hidden="true" />
-                <p className="mt-3 font-bold">{view === "active" ? "No active orders" : "No collected orders yet"}</p>
+                <p className="mt-3 font-bold">No collected orders yet</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {view === "active" ? "Select New order to add a pickup ticket." : "Tickets appear here once they’re marked collected."}
+                  Tickets appear here once they’re marked collected.
                 </p>
               </div>
             )}
@@ -254,7 +268,7 @@ export function StaffQueue() {
         </>
       )}
       {dialog && (
-        <Dialog title={dialogTitles[dialog.kind]} busy={isSaving} onDismiss={() => setDialog(null)} dialogRef={orderDialog}>
+        <Dialog title={dialogTitles[dialog.kind]} busy={isSaving} onDismiss={dismissOrderDialog} dialogRef={orderDialog}>
           {(dialog.kind === "create" || dialog.kind === "edit") && (
             <OrderForm
               order={dialog.kind === "edit" ? dialog.order : undefined}
