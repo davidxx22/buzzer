@@ -3,7 +3,6 @@
 import { BellRing, Ticket } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { BrandMarks } from "@/components/brand-marks";
 import { cn } from "@/lib/utils";
 import { formatTicketNumber, isOrderId, isPickupOrder, statusLabels, ticketStatuses, type OrderItem, type PickupOrder, type TicketStatus } from "./model";
 import { QueueError } from "./queue-feedback";
@@ -177,8 +176,7 @@ function TicketDetails({ order, connection, liveId, scanId }: {
   return (
     <TicketShell tone={connection === "live" ? order.status : undefined} expanded={hasFooter || connection === "connecting"}>
       <div className="flex-1 px-6 pt-6 pb-8 sm:px-8 sm:pt-8">
-        <BrandMarks />
-        <p className="mt-4 flex items-center gap-2 text-sm font-semibold">
+        <p className="flex items-center gap-2 text-sm font-semibold">
           <Ticket size={18} strokeWidth={1.75} aria-hidden="true" />
           Pickup ticket
         </p>

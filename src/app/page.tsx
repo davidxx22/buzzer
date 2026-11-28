@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BrandMarks } from "@/components/brand-marks";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
@@ -7,8 +6,7 @@ export default function HomePage() {
     <div className="mx-auto max-w-6xl px-4 pt-8 pb-12 sm:px-8 sm:pt-16 md:pt-20">
       <section className="grid md:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]" aria-labelledby="home-heading">
         <div className="ticket-paper relative px-6 py-10 sm:px-10 sm:py-12 md:px-14 md:py-20">
-          <BrandMarks />
-          <h1 id="home-heading" className="mt-5 max-w-[11ch] font-display text-6xl leading-[0.89] font-semibold tracking-tight sm:text-7xl lg:text-[6.5rem]">
+          <h1 id="home-heading" className="max-w-[11ch] font-display text-6xl leading-[0.89] font-semibold tracking-tight sm:text-7xl lg:text-[6.5rem]">
             The digital buzzer
           </h1>
           <p className="mt-6 max-w-[32ch] text-base leading-6 sm:text-lg sm:leading-7">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BrandMarks } from "@/components/brand-marks";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "./globals.css";
 
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         >
           Skip to content
         </a>
+        <BrandMarks />
         <main id="main-content" tabIndex={-1}>{children}</main>
       </body>
     </html>
