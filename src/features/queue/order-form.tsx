@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { isOrderDetails, orderLimits, type OrderDetails, type PickupOrder } from "./model";
@@ -74,7 +74,6 @@ export function OrderForm({ busy, error, order, onSave, onCancel }: {
             setItems((oldItems) => [...oldItems, { key, name: "", quantity: "1" }]);
           }}
         >
-          <Plus size={18} strokeWidth={1.5} aria-hidden="true" />
           Add item
         </Button>
       </fieldset>

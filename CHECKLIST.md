@@ -46,6 +46,7 @@
 - [x] Verify Notify marks an order ready and shows the pickup alert, and Collected moves it to Collected orders.
 - [x] Verify the QR icon opens the pickup dialog and Notify and Collected have matching dimensions.
 - [x] Verify the Details button sits between the QR icon and Notify or Collected, opens Order details, and offers editing only for waiting orders.
+- [x] Verify both New order buttons and Add item are text-only, and staff can add items when creating an order or editing it from Details.
 - [x] Verify the New order, Order details, and Pickup QR dialogs fit narrow phone screens, the QR stays square, and order creation, editing, and pickup status updates still work in the local demo.
 - [x] Verify edits preserve the order number and timer, reject stale saves, and show updated items on the original live pickup link in the shared demo and a local hosted-mode test.
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Plus, QrCode } from "lucide-react";
+import { ClipboardList, QrCode } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -151,7 +151,6 @@ export function StaffQueue() {
           <p className="mt-2 max-w-lg leading-6 text-muted-foreground">Mark orders ready for pickup, then close each ticket when it’s collected.</p>
         </div>
         <Button ref={newOrderButton} type="button" disabled={state.kind !== "loaded"} onClick={openNewOrder}>
-          <Plus size={18} strokeWidth={1.75} aria-hidden="true" />
           New order
         </Button>
       </div>

@@ -1,4 +1,4 @@
-import { CircleAlert, Plus } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import Image from "next/image";
 import type { MouseEventHandler } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ export function EmptyActiveQueue({ onNewOrder }: { onNewOrder: MouseEventHandler
         <p className="text-sm text-muted-foreground">Create an order to give the customer a pickup ticket.</p>
       </div>
       <Button type="button" className="mt-1" onClick={onNewOrder}>
-        <Plus size={18} strokeWidth={1.75} aria-hidden="true" />
         New order
       </Button>
     </div>
