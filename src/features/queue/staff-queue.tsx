@@ -196,11 +196,11 @@ export function StaffQueue() {
                         return (
                           <li key={ticket.id} className="staff-ticket grid overflow-hidden rounded-r-lg border border-l-0 border-border bg-card md:items-center">
                             <div
-                              className="ticket-paper staff-ticket-number row-span-2 grid content-center gap-px self-stretch px-2 py-3 text-center md:row-span-1"
+                              className="ticket-paper staff-ticket-number row-span-2 grid content-center gap-px self-stretch px-2 py-4 text-center md:row-span-1"
                               data-tone={ticket.status}
                             >
                               <span className="text-xs leading-none font-semibold">No.</span>
-                              <span className="font-display text-[2.125rem] leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-[2.5rem]">{number}</span>
+                              <span className="font-display text-[2.5rem] leading-none font-semibold tabular-nums [overflow-wrap:anywhere] md:text-[2.75rem]">{number}</span>
                             </div>
                             {ticket.status !== "collected" && (
                               <div className="flex min-w-0 justify-between gap-2 px-3 pt-3 md:gap-4 md:px-4 md:pb-3">
@@ -210,7 +210,7 @@ export function StaffQueue() {
                                 <TicketTimer ticket={ticket} now={now} />
                               </div>
                             )}
-                            <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-3 md:col-start-3 md:justify-end md:px-4">
+                            <div className="col-start-2 flex flex-wrap items-center gap-2 px-3 py-4 md:col-start-3 md:justify-end md:px-4">
                               {isPickupOrder(ticket) && (
                                 <Button
                                   variant="outline"
