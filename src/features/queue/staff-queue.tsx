@@ -1,10 +1,11 @@
 "use client";
 
-import { ChevronDown, ClipboardList, Plus, QrCode } from "lucide-react";
+import { ClipboardList, Plus, QrCode } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
+import { CollectedSortMenu, type CollectedSort } from "./collected-sort-menu";
 import { formatTicketNumber, isPickupOrder, nextStatus, type OrderDetails as OrderDetailsData, type OrderSource, type PickupOrder, type QueueTicket } from "./model";
 import { OrderDetails } from "./order-details";
 import { OrderForm } from "./order-form";
@@ -16,7 +17,6 @@ import { TicketTimer } from "./ticket-timer";
 import { useQueue } from "./use-queue";
 
 type QueueView = "active" | "collected";
-type CollectedSort = "latest" | "number";
 type QueueDialog =
   | { kind: "create" }
   | { kind: "qr"; order: PickupOrder; source: OrderSource }
@@ -162,20 +162,7 @@ export function StaffQueue() {
                 </Button>
               </div>
               {view === "collected" && visibleSections.length > 0 && (
-                <label className="inline-flex max-w-full items-center gap-2 text-sm">
-                  <span className="shrink-0 text-muted-foreground">Sort by:</span>
-                  <span className="relative grid min-w-0 items-center">
-                    <select
-                      className="min-h-11 max-w-full cursor-pointer appearance-none rounded-lg bg-card ps-3 pe-9 font-medium text-foreground focus:outline-none forced-colors:appearance-auto forced-colors:pe-3"
-                      value={collectedSort}
-                      onChange={(event) => setCollectedSort(event.target.value === "number" ? "number" : "latest")}
-                    >
-                      <option value="latest">Latest collected</option>
-                      <option value="number">Ticket number</option>
-                    </select>
-                    <ChevronDown size={16} strokeWidth={1.5} className="pointer-events-none absolute end-3 text-muted-foreground forced-colors:hidden" aria-hidden="true" />
-                  </span>
-                </label>
+                <CollectedSortMenu value={collectedSort} onChange={setCollectedSort} />
               )}
             </div>
             <p role="status" aria-atomic="true" className="sr-only">{announcement}</p>
