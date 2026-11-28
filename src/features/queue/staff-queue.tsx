@@ -163,9 +163,9 @@ export function StaffQueue() {
               </div>
               {view === "collected" && visibleSections.length > 0 && (
                 <label className="relative inline-grid max-w-full items-center text-sm">
-                  <span className="pointer-events-none absolute start-3 text-muted-foreground">Sort by</span>
+                  <span className="pointer-events-none absolute start-3 text-muted-foreground">Sort by:</span>
                   <select
-                    className="min-h-11 max-w-full cursor-pointer appearance-none rounded-lg border border-border bg-card ps-16 pe-9 font-medium text-foreground transition-colors hover:bg-muted forced-colors:appearance-auto forced-colors:pe-3"
+                    className="min-h-11 max-w-full cursor-pointer appearance-none rounded-lg bg-card ps-[4.25rem] pe-9 font-medium text-foreground transition-colors hover:bg-muted forced-colors:appearance-auto forced-colors:pe-3"
                     value={collectedSort}
                     onChange={(event) => setCollectedSort(event.target.value === "number" ? "number" : "latest")}
                   >
