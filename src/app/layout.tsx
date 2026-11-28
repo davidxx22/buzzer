@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { SiteHeader } from "@/components/site-header";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "./globals.css";
 
@@ -18,7 +17,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         >
           Skip to content
         </a>
-        <SiteHeader />
         <main id="main-content" tabIndex={-1}>{children}</main>
       </body>
     </html>
