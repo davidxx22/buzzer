@@ -37,7 +37,7 @@
 - [x] Verify elapsed waiting time updates every second and a new timer starts when staff mark the order ready.
 - [x] Verify the Ready for pickup and Waiting orders headings appear without horizontal lines.
 - [x] Verify active staff tickets show timers and notes, with item summaries available in Details, the QR dialog, and the customer ticket.
-- [x] Verify the illustrated active queue empty state fits a narrow phone, opens the New order form, disappears when an order is created, and returns after the last active order is collected.
+- [x] Verify the active queue empty state shows the green and white notepad, fits a narrow phone, opens the New order form, disappears when an order is created, and returns after the last active order is collected.
 - [x] Verify collected rows show the ticket number, QR icon, and Details, with items, notes, and status available in the Details dialog.
 - [x] Verify the sort icon fits beside both tabs on narrow portrait screens and the text dropdown appears on landscape phones and tablets. Verify the menu fits, both choices work, and the selected sort survives rotation.
 - [x] Verify Notify marks an order ready and shows the pickup alert, and Collected moves it to Collected orders.
