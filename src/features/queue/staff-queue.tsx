@@ -152,12 +152,12 @@ export function StaffQueue() {
           <div className="mt-6"><QueueCounts tickets={tickets} /></div>
 
           <div className="mt-6 border-t border-border pt-4">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex flex-wrap gap-2">
-                <Button ref={activeFilter} variant={view === "active" ? "default" : "ghost"} aria-pressed={view === "active"} onClick={() => setView("active")}>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-1 sm:gap-2">
+              <div className="flex flex-wrap gap-1 sm:gap-2">
+                <Button ref={activeFilter} className="px-3 max-[360px]:px-2 max-[360px]:text-xs sm:px-4" variant={view === "active" ? "default" : "ghost"} aria-pressed={view === "active"} onClick={() => setView("active")}>
                   Active orders
                 </Button>
-                <Button variant={view === "collected" ? "default" : "ghost"} aria-pressed={view === "collected"} onClick={() => setView("collected")}>
+                <Button className="px-3 max-[360px]:px-2 max-[360px]:text-xs sm:px-4" variant={view === "collected" ? "default" : "ghost"} aria-pressed={view === "collected"} onClick={() => setView("collected")}>
                   Collected orders
                 </Button>
               </div>

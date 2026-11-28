@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from "lucide-react";
+import { ArrowDownWideNarrow, Check } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 const sortLabels = {
@@ -31,47 +31,44 @@ export function CollectedSortMenu({ value, onChange }: {
   }, []);
 
   return (
-    <div className="inline-flex max-w-full items-center gap-2 text-sm">
-      <span className="shrink-0 text-muted-foreground">Sort by:</span>
-      <details
-        ref={menu}
-        className="relative"
-        onBlur={(event) => {
-          if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) close();
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "Escape" && event.currentTarget.open) {
-            event.preventDefault();
-            close(true);
-          }
-        }}
+    <details
+      ref={menu}
+      className="relative ms-auto shrink-0 text-sm"
+      onBlur={(event) => {
+        if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) close();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && event.currentTarget.open) {
+          event.preventDefault();
+          close(true);
+        }
+      }}
+    >
+      <summary
+        ref={trigger}
+        aria-label={`Sort by: ${sortLabels[value]}`}
+        title="Sort collected orders"
+        className="grid size-11 cursor-pointer list-none place-items-center rounded-lg text-foreground focus:outline-none [&::-webkit-details-marker]:hidden"
       >
-        <summary
-          ref={trigger}
-          aria-label={`Sort by: ${sortLabels[value]}`}
-          className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg px-3 font-medium text-foreground focus:outline-none [&::-webkit-details-marker]:hidden"
-        >
-          {sortLabels[value]}
-          <ChevronDown size={16} strokeWidth={1.5} className="text-muted-foreground" aria-hidden="true" />
-        </summary>
-        <div role="group" aria-label="Sort choices" className="absolute end-0 top-full z-20 mt-1 grid w-max min-w-full gap-0.5 rounded-lg border border-border bg-card p-1 shadow-md shadow-black/10">
-          {(["latest", "number"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={value === option}
-              className="flex min-h-10 cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 text-start font-medium text-foreground hover:bg-muted aria-pressed:bg-muted"
-              onClick={() => {
-                onChange(option);
-                close(true);
-              }}
-            >
-              {sortLabels[option]}
-              <Check size={14} strokeWidth={2} className={value === option ? "shrink-0 text-primary" : "invisible shrink-0"} aria-hidden="true" />
-            </button>
-          ))}
-        </div>
-      </details>
-    </div>
+        <ArrowDownWideNarrow size={20} strokeWidth={1.75} aria-hidden="true" />
+      </summary>
+      <div role="group" aria-label="Sort choices" className="absolute end-0 top-full z-20 mt-1 grid w-max gap-0.5 rounded-lg border border-border bg-card p-1 shadow-md shadow-black/10">
+        {(["latest", "number"] as const).map((option) => (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={value === option}
+            className="flex min-h-10 cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 text-start font-medium text-foreground hover:bg-muted aria-pressed:bg-muted"
+            onClick={() => {
+              onChange(option);
+              close(true);
+            }}
+          >
+            {sortLabels[option]}
+            <Check size={14} strokeWidth={2} className={value === option ? "shrink-0 text-primary" : "invisible shrink-0"} aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+    </details>
   );
 }
